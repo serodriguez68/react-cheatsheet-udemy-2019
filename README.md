@@ -174,7 +174,7 @@ Class based components must comply 3 rules:
     1.1 Note: Now it can technically by used with functional components through the 'hooks' system.
 2. You will confuse props with state.
 3. 'State' is a JS object that contains data relevant to a singular component.
-4. Updating 'state' on a component causes the component to (almost) instantly rerender.
+4. Updating 'state' on a component causes the component to (almost) instantly re-render. Re-rendering also triggers the re-rendering of ALL CHILD components.
 5. State must be initialized when a component is created. This can be done in 2 equivalent ways (They are equivalent
 once Babel transpiles the code.) 
 ```jsx harmony
