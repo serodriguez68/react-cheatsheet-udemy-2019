@@ -256,3 +256,4 @@ break cache?
 
 ### A test with the png format
 ![Test with png format cache](./diagrams/test_png.png)
+Another cache buster?
