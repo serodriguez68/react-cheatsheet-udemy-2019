@@ -251,4 +251,5 @@ class App extends React.Component {
 - `componentWillUnmount`: called when the component is going to be removed from the screen. Typically used for cleanup.
 
 ##### A Test
+break cache?
 ![Component Lifecycle methods](./diagrams/test.svg)
