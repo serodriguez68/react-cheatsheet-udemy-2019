@@ -253,3 +253,6 @@ class App extends React.Component {
 ##### A Test
 break cache?
 ![Component Lifecycle methods cache](./diagrams/test.svg)
+
+### A test with the png format
+![Test with png format](./diagrams/test_png.png)
