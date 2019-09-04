@@ -252,4 +252,4 @@ class App extends React.Component {
 
 ##### A Test
 break cache?
-![Component Lifecycle methods](./diagrams/test.svg)
+![Component Lifecycle methods cache](./diagrams/test.svg)
