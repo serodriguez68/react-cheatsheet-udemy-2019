@@ -255,5 +255,5 @@ break cache?
 ![Component Lifecycle methods cache](./diagrams/test.svg)
 
 ### A test with the png format
-![Test with png format cache](./diagrams/test_png.png)
-Another cache buster?
+![Test with png format cache2](./diagrams/test_png.png)
+Another cache buster2?
