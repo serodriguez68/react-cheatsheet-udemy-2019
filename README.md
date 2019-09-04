@@ -249,3 +249,6 @@ class App extends React.Component {
 - Updates are caused by changes in state through the `setState` method.
 - `componentDidUpdate`: called every time the component gets updated.  It is called AFTER `render` when the state changes.  
 - `componentWillUnmount`: called when the component is going to be removed from the screen. Typically used for cleanup.
+
+##### A Test
+![Component Lifecycle methods](./diagrams/test.svg)
