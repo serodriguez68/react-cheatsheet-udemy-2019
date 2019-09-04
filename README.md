@@ -250,13 +250,8 @@ class App extends React.Component {
 - `componentDidUpdate`: called every time the component gets updated.  It is called AFTER `render` when the state changes.  
 - `componentWillUnmount`: called when the component is going to be removed from the screen. Typically used for cleanup.
 
-##### A Test
-break cache?
-![Component Lifecycle methods cache](./diagrams/test.svg)
 
-### A test with the png format
-![Test with png format cache2](./diagrams/test_png.png)
-Another cache buster2?
 
-Note: do edit any of the diagrams go to
+----------------------------------------------------------------
+Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
