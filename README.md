@@ -257,3 +257,6 @@ break cache?
 ### A test with the png format
 ![Test with png format cache2](./diagrams/test_png.png)
 Another cache buster2?
+
+Note: do edit any of the diagrams go to
+`https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
