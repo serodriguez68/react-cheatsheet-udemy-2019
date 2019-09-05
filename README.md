@@ -318,6 +318,51 @@ const SeasonDisplay = (props) => {
     color: red;
 }
 ```
+##### Default props
+Default props are used when we want a component to have a props with a default value in case the parent component
+does not specify a particular prop.
+```jsx harmony
+const Spinner = (props) => {
+    return(
+        <div className="ui active dimmer">
+            <div className="ui big text loader">{props.message}</div>
+        </div>
+    );
+};
+
+// Default Props is a JS object in the main body of the Spinner.js file
+Spinner.defaultProps = {
+    message: 'Loading...'
+};
+```
+
+##### Pattern: Clean Conditional Rendering Through Helper Methods
+As a general rule, we want to avoid having more than ONE return in the `render` method or having any heavy logic in it.
+To avoid this, we can create custom _helper methods_ that abstract better the conditional logic.
+```jsx harmony
+class App extends React.Component {
+    //...
+    // This is a helper method that unloads the conditional logic from the render method
+    renderContent() {
+        if (this.state.errorMessage && !this.state.lat) {
+            return <div>Error: {this.state.errorMessage}</div>;
+        }
+        if (!this.state.errorMessage && this.state.lat) {
+            return <SeasonDisplay lat={this.state.lat} />
+        }
+        return <Spinner message = 'Determining your Location...'/>;
+    }
+
+    render() {
+        return (
+            <div className="some-class-that-is-always-needed">
+                {this.renderContent()}
+            </div>
+        );
+    }
+}
+```
+
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
