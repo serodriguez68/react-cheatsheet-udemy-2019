@@ -23,7 +23,7 @@ ReactDOM is a library that deals with putting those components on the DOM.  If w
 
 ##### Functional Components vs Class Based Components.
 - _Use Functional Components_ for very simple content (e.g. only render HTML using some props passed to it).
-- _Use Class Components_ for everything else (e.g. complex logic, handling user interaction).
+- _Use Class Components_ for everything else (e.g. complex logic, handling any user interaction).
 ![Benefits of Class Components](./diagrams/class-components-benefits.png)
 
 ##### What are Props in react and why do they exist?
@@ -362,7 +362,37 @@ class App extends React.Component {
     }
 }
 ```
+##### Handling User Interaction With Event Handlers
+We can detect user interaction through special props like `onChange`.  It is our job
+to define a **callback function** that will handle the event with any custom logic we need.
 
+The most used special properties are:
+- `onClick`: any HTML element can be wired up with `onClick`.
+- `onChange`: triggered when a user changes an input.  Only input fields trigger `onChange`.
+- `onSubmit`: only forms trigger `onSubmit`.
+
+Here is an example for handling `onChange` on a Search Bar.
+```jsx harmony
+class SearchBar extends React.Component {
+    // Used as a callback function to handle the change
+    // "event" is passed by default to all event handlers
+    onInputChange(event) {
+        // Whatever logic I need
+        console.log(event.target.value);
+    }
+
+    render() {
+        return (
+            <form>
+                <label>Image Search</label>
+                {/* onChange is a special property name that gets triggered when the input changes. */}
+                {/* We provide the callback function to handle the change */}
+                <input type="text" onChange={this.onInputChange}/>
+            </form>
+        );
+    }
+}
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
