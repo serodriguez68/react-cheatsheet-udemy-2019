@@ -250,6 +250,35 @@ class App extends React.Component {
 - `componentDidUpdate`: called every time the component gets updated.  It is called AFTER `render` when the state changes.  
 - `componentWillUnmount`: called when the component is going to be removed from the screen. Typically used for cleanup.
 
+##### Pattern: Use configuration objects for conditional rendering
+When we need to get some text, class names (etc) based on a condition, configuration objects are a better alternative
+than `if..else` statements.  See example:
+```jsx harmony
+//  This is the configuration object
+const seasonConfig = {
+    summer: {
+        text: 'Let\'s hit the Beach',
+        iconName: 'sun'
+    },
+    winter: {
+        text: 'Burr, it is chilly',
+        iconName: 'snowflake'
+    }
+};
+// ...
+const SeasonDisplay = (props) => {
+    const season = getSeason(props.lat, new Date().getMonth()); // returns either 'summer' or 'winter'
+    const {text, iconName} = seasonConfig[season]; // Destructurizing a JS object
+    return (
+        <div>
+            <i className={`icon ${iconName}`} />
+            <h1>{text}</h1>
+            <i className={`icon ${iconName}`} />
+        </div>
+    );
+};
+```
+
 
 
 ----------------------------------------------------------------
