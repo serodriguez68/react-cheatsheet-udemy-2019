@@ -279,7 +279,45 @@ const SeasonDisplay = (props) => {
 };
 ```
 
+##### Pattern: Creating Component-Specific CSS
+A common pattern is to create a dedicated stylesheet for each component which is in charge of defining the styles 
+of the component.  For example, for the `SeasonDisplay.js`, we create a `SeasonDisplay.css`.
 
+Inside the `SeasonDisplay.js` we:
+- `import SeasonDisplay.css` and Babel will make that the stylesheet gets correctly imported in the HTML.
+- Add a matching `season-display` class to the root of the returned JSX so that we can specifically target elements
+inside that component.
+
+Example:
+```jsx harmony
+// SeasonDisplay.js
+import './SeasonDisplay.css';
+
+const SeasonDisplay = (props) => {
+    // ...
+    return (
+        // Note the season-display class
+        <div className={`season-display ${season}`}>
+            {/* ... */}
+        </div>
+    );
+};
+```
+
+```css
+.season-display {
+    display: flex;
+    justify-content: center;
+}
+
+.season-display.winter i {
+    color: blue;
+}
+
+.season-display.summer i {
+    color: red;
+}
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
