@@ -388,6 +388,9 @@ class SearchBar extends React.Component {
                 {/* onChange is a special property name that gets triggered when the input changes. */}
                 {/* We provide the callback function to handle the change */}
                 <input type="text" onChange={this.onInputChange}/>
+                
+                {/* An alternative frequently used syntax is using arrow functions when the handlers are small */}
+                <input type="text" onChange={ (e) => console.log(e.target.value) }/>
             </form>
         );
     }
