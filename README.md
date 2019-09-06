@@ -587,7 +587,38 @@ class SearchBar extends React.Component {
 
 ##### Communicating from Child to Parent through callbacks
 By design, React only allows data to be pushed DOWN from parents to children through the props system.  If we want to communicate from a child to a parent, the parent needs to provide a callback function and the child will hold it as a prop to use it when necessary.
+![Children to parent communication](./diagrams/children_to_parent_communication.svg)
 
+```jsx harmony
+// Parent
+class App extends React.Component {
+    
+    // The callback function for communication
+    onSearchSubmit = (term) => {
+        console.log(`From app: ${term}`);
+    };
+
+    render() {
+        return  (
+            <div className="ui container" style={{marginTop: '10px'}}>
+	        {/* Pass down callback function as prop */}
+                <SearchBar onSearchSubmit={this.onSearchSubmit}/>
+            </div>
+        );
+    }
+}
+
+// Child
+class SearchBar extends React.Component {
+    state = { term: ''};
+
+    onFormSubmit = (event) => {
+        event.preventDefault();
+        // Use Callback function to notify parent
+        this.props.onSearchSubmit(this.state.term);
+    };
+}
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
