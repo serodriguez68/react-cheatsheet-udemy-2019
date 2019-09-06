@@ -621,6 +621,17 @@ class SearchBar extends React.Component {
 }
 ```
 
+## Making API requests with react
+React itself does NOT do network requests.  For this we need to use an external library like `axios` or
+the built-in function `fetch`.
+
+##### Axios vs Fetch
+- `fetch` is a built-in function to do network requests that does not add any overhead. However, it is very basic
+and requires coding some boilerplate code.
+- `axios` is a higher level 3rd party library that handles requests in a very predictable way.  Axios is recommended
+to perform the API requests on react apps.
+    - `npm install --save axios`  
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
