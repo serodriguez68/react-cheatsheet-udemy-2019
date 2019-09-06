@@ -387,6 +387,7 @@ class SearchBar extends React.Component {
                 <label>Image Search</label>
                 {/* onChange is a special property name that gets triggered when the input changes. */}
                 {/* We provide the callback function to handle the change */}
+                {/* Note that this example shows an uncontrolled element for simplicity. We prefer controlled elements */}
                 <input type="text" onChange={this.onInputChange}/>
                 
                 {/* An alternative frequently used syntax is using arrow functions when the handlers are small */}
@@ -396,7 +397,186 @@ class SearchBar extends React.Component {
     }
 }
 ```
+##### Controlled vs Uncontrolled Elements
+Depending on how we wire up them, HTML input elements can be classified as **controlled** or **uncontrolled**.
 
+Uncontrolled elements are elements in which the "truth" of the data is sitting inside the HTML. In the following 
+example, if we wanted to find the text in the input field from an arbitrary point in the component (e.g. from 
+`componentDidUpdate`), we have no choice but to reach out to the HTML input element and read the value.
+
+```jsx harmony
+class SearchBar extends React.Component {
+    onInputChange(event) { /* Whatever logic I need  */ }
+    
+    componentDidUpdate() {
+        // To find out the search term, we have no option but to reach out to the HTML input.
+    } 
+
+    render() {
+        return (
+            <form>
+                <label>Image Search</label>
+                <input type="text" onChange={this.onInputChange}/>
+            </form>
+        );
+    }
+}
+```
+
+If we wire things differently we can make sure that the JS Component contains all the data and drives the HTML
+(not the other way around).  __We always prefer controlled elements__. 
+```jsx harmony
+class SearchBar extends React.Component {
+    // We use component state to store the search term.  In this way, we can reach for the state
+    // at any arbitrary point to figure out the term.
+    state = { term: ''};
+
+    render() {
+        return (
+            <form className="ui form">
+                <label>Image Search</label>
+                {/* We fix (control) the value of the input through the state to make sure that */}
+                {/* react DRIVES the HTML and not the other way around */}
+                <input
+                    type="text"
+                    value={this.state.term}
+                    onChange={ (e) => this.setState({term: e.target.value}) } />
+            </form>
+        );
+    }
+}
+```
+
+##### Common Error: TypeError: Cannot read property 'state' of undefined / How `this` works in Javascript
+
+Note: this is a complex issue, to get a full understanding of the problem, re-watch videos __"84. Understanding 'this'
+in Javascript"__ and __"85. Solving Context Issues"__ from Stephen Grider's Udemy course. 
+
+The error is caused by how the context system works in JS (i.e. what value is assigned to `this` at runtime).
+
+The next code exemplifies the problem:
+```jsx harmony
+class SearchBar extends React.Component {
+    state = { term: ''};
+
+    render() {
+        return (
+            /* Here we 'rip out' onFormSubmit from the SearchBar instance and give it to `onSubmit` */
+            <form className="ui form" onSubmit={ this.onFormSubmit }>
+                    <label>Image Search</label>
+                    <input
+                        type="text"
+                        value={this.state.term}
+                        onChange={ (e) => this.setState({term: e.target.value}) } />
+            </form>
+        );
+    }
+    
+    onFormSubmit(event) {
+            event.preventDefault();
+            // Here `this` causes the problem because the function is called outside the scope of the
+            // SearchBar instance.  In that context `this = undefined`.
+            console.log(this.state.term);
+        }
+}
+``` 
+_Rule of thumb: the value of `this` inside a JS function_
+
+`this` inside a function takes the value of the instance on which the function is being called
+(i.e. what is left of the dot). For example, given an arbitrary function `myFun` that contains `this` inside it.
+```js
+myCar.myFun(); // `this` refers to the myCar instance
+myTruck.myFun(); // `this` refers to the myTruck instance
+myFun2 = myCar.myFun; // Rip out myFun and assign it to myFun2.
+myFun2(); //`this` refers to `undefined` since myFun2 is not being called on any instance.
+```  
+
+_Solutions to the `this` context problem_
+There are many solutions to this problem, we name the most popular.
+
+
+- Solution 1: Fix the value of `this` inside the problematic function by binding it inside the `constructor`
+```js
+class SearchBar extends React.Component {
+    state = { term: ''};
+    
+    constructor(props) {
+        super(props);
+        // Bind returns a new version of the function with the `this` keyword fixed to the current SearchBar instance.
+        this.onFormSubmit = this.onFormSubmit.bind(this);
+   }
+
+    render() {
+        return (
+            <form className="ui form" onSubmit={ this.onFormSubmit }>
+                    <label>Image Search</label>
+                    <input
+                        type="text"
+                        value={this.state.term}
+                        onChange={ (e) => this.setState({term: e.target.value}) } />
+            </form>
+        );
+    }
+    
+    onFormSubmit(event) {
+            event.preventDefault();
+            // Once binded, `this` will always refer to the SearchBar instance 
+            // (i.e. it is no longer context dependent).
+            console.log(this.state.term);
+        }
+}
+```
+
+- Solution 2: Use ES6 arrow functions to declare instance methods. 
+Arrow functions automatically bind the value of `this`. This is the most common method.
+```jsx harmony
+class SearchBar extends React.Component {
+    state = { term: ''};
+
+    render() {
+        return (
+            <form className="ui form" onSubmit={ this.onFormSubmit }>
+                    <label>Image Search</label>
+                    <input
+                        type="text"
+                        value={this.state.term}
+                        onChange={ (e) => this.setState({term: e.target.value}) } />
+            </form>
+        );
+    }
+    
+    onFormSubmit = (event) => {
+        event.preventDefault();
+        // Here `this` would cause the problem.  However, arrow functions automatically bind this to the instance.
+        console.log(this.state.term);
+    };
+}
+```
+
+- Solution 3: Wrap callback inside an arrow function (that automatically binds `this`).
+```jsx harmony
+class SearchBar extends React.Component {
+    state = { term: ''};
+
+    render() {
+        return (
+            // Wrapping the callback with an arrow function automatically binds `this`
+            <form className="ui form" onSubmit={ (e) => this.onFormSubmit(e) }>
+                    <label>Image Search</label>
+                    <input
+                        type="text"
+                        value={this.state.term}
+                        onChange={ (e) => this.setState({term: e.target.value}) } />
+            </form>
+        );
+    }
+    
+    onFormSubmit(event) {
+            event.preventDefault();
+            console.log(this.state.term);
+        }
+}
+```
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
