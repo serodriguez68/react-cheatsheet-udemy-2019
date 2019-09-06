@@ -387,10 +387,60 @@ class SearchBar extends React.Component {
                 <label>Image Search</label>
                 {/* onChange is a special property name that gets triggered when the input changes. */}
                 {/* We provide the callback function to handle the change */}
+                {/* Note that this example shows an uncontrolled element for simplicity. We prefer controlled elements */}
                 <input type="text" onChange={this.onInputChange}/>
                 
                 {/* An alternative frequently used syntax is using arrow functions when the handlers are small */}
                 <input type="text" onChange={ (e) => console.log(e.target.value) }/>
+            </form>
+        );
+    }
+}
+```
+##### Controlled vs Uncontrolled Elements
+Depending on how we wire up them, HTML input elements can be classified as **controlled** or **uncontrolled**.
+
+Uncontrolled elements are elements in which the "truth" of the data is sitting inside the HTML. In the following 
+example, if we wanted to find the text in the input field from an arbitrary point in the component (e.g. from 
+`componentDidUpdate`), we have no choice but to reach out to the HTML input element and read the value.
+
+```jsx harmony
+class SearchBar extends React.Component {
+    onInputChange(event) { /* Whatever logic I need  */ }
+    
+    componentDidUpdate() {
+        // To find out the search term, we have no option but to reach out to the HTML input.
+    } 
+
+    render() {
+        return (
+            <form>
+                <label>Image Search</label>
+                <input type="text" onChange={this.onInputChange}/>
+            </form>
+        );
+    }
+}
+```
+
+If we wire things differently we can make sure that the JS Component contains all the data and drives the HTML
+(not the other way around).  __We always prefer controlled elements__. 
+```jsx harmony
+class SearchBar extends React.Component {
+    // We use component state to store the search term.  In this way, we can reach for the state
+    // at any arbitrary point to figure out the term.
+    state = { term: ''};
+
+    render() {
+        return (
+            <form className="ui form">
+                <label>Image Search</label>
+                {/* We fix (control) the value of the input through the state to make sure that */}
+                {/* react DRIVES the HTML and not the other way around */}
+                <input
+                    type="text"
+                    value={this.state.term}
+                    onChange={ (e) => this.setState({term: e.target.value}) } />
             </form>
         );
     }
