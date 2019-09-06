@@ -584,6 +584,11 @@ class SearchBar extends React.Component {
         }
 }
 ```
+
+##### Communicating from Child to Parent through callbacks
+By design, React only allows data to be pushed DOWN from parents to children through the props system.  If we want to communicate from a child to a parent, the parent needs to provide a callback function and the child will hold it as a prop to use it when necessary.
+
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
