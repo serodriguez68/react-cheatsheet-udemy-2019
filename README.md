@@ -115,7 +115,7 @@ const App = () => {
 ```
 
 ```jsx harmony
-// Receiving: passed as an object as the first argument to the functional component.
+// Receiving props in functional components: passed as an object as the first argument.
 const CommentDetail = (props) => {
     return (
         <div className="comment">
@@ -129,6 +129,13 @@ const CommentDetail = (props) => {
         </div>
     );
 };
+
+// Receiving props in class based component: added to a property this.props
+class CommentDetail extends React.Component {
+    someFunction() {
+        console.log(this.props.author);
+    }
+}
 ```
 
 ##### Injecting custom children to a component

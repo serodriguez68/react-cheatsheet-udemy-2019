@@ -7,7 +7,7 @@ class SearchBar extends React.Component {
         event.preventDefault();
         // Here `this` would cause a problem because the function is called outside the scope of the
         // SearchBar instance `this = undefined`.  However, arrow functions automatically bind this to the instance.
-        console.log(this.state.term);
+        this.props.onSearchSubmit(this.state.term);
     };
 
     render() {
