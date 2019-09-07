@@ -625,12 +625,97 @@ class SearchBar extends React.Component {
 React itself does NOT do network requests.  For this we need to use an external library like `axios` or
 the built-in function `fetch`.
 
-##### Axios vs Fetch
+### Axios vs Fetch
 - `fetch` is a built-in function to do network requests that does not add any overhead. However, it is very basic
 and requires coding some boilerplate code.
 - `axios` is a higher level 3rd party library that handles requests in a very predictable way.  Axios is recommended
 to perform the API requests on react apps.
     - `npm install --save axios`  
+    
+### Working with JS Promises
+A promise is an object that represents the eventual completion or failure of an asynchronous operation.  Promises are
+frequently used in JS for network requests and it is up to the developers to code what should happen when the
+promise succeeds or fails.
+
+In the context of API requests, there are 2 options for handling promises: 1) `promise.then`, 2) `async`, `await`
+
+Note: more information can be found on video _"92. Handling Requests with Async Await"_ from Stephen Grider's course.
+
+#### Option 1: Using `promise.then()`
+The `then` method allows us to give the promise a callback to execute once the promise succeeds.
+```jsx harmony
+class App extends React.Component {
+
+    // Callback for making a network request when the search term changes.
+    onSearchSubmit = (term) => {
+        axios.get('https://api.unsplash.com/search/photos', {
+            params: { query: term},
+            headers: {
+                Authorization: 'Client-ID someRandomToken'
+            }
+        }).then((response)=>{
+            // axios.get is async and returns a promise, so deal with it with `then` callback
+            console.log(response.data.results);
+            // Do whatever you need to do...
+        })
+    };
+
+    render() { /*...*/ }
+}
+```
+
+#### Option 2: Using `async` and `await`
+This is a newer syntax that allows us to write simpler and cleaner code.
+```jsx harmony
+class App extends React.Component {
+
+    // Callback for making a network request when the search term changes.
+    // The network request is asynchronous, so we tag our function as `async` and
+    // `await` to allow the promise to resolve
+     onSearchSubmit = async (term) => {
+         // axios.get is async and returns a promise, so we need to deal with the promise.
+         const response = await axios.get('https://api.unsplash.com/search/photos', {
+            params: { query: term},
+            headers: {
+                Authorization: 'Client-ID someRandomToken'
+            }
+        });
+        this.setState({images: response.data.results});
+    };
+
+    render() { /*...*/ }
+}
+```
+### Creating Custom API Clients with axios
+With axios, we can create a dedicated client that is configured to make requests with whatever configuration we 
+set it up. This allows us to extract all the configuration, and authentication logic for a particular service
+into a dedicated file.
+
+For example, for communicating with the unsplash API we could:
+```jsx harmony
+// 1. Create a file in src/api/unsplash.js that will hold the dedicated unsplash client
+import axios from 'axios';
+
+export default axios.create({
+    baseURL: 'https://api.unsplash.com',
+    headers: {
+        Authorization: 'Client-ID someRandomToken'
+    }
+});
+
+// 2. Then we only use this pre-configured client in all other places we need to communicate with unsplash
+import unsplash from "../api/unsplash";
+
+class App extends React.Component {
+    onSearchSubmit = async (term) => {
+        // Here we use the pre-configured unsplash client
+        const response = await unsplash.get('/search/photos', {
+            params: { query: term},
+        });
+        // ...
+    };
+}
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
