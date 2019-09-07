@@ -621,18 +621,18 @@ class SearchBar extends React.Component {
 }
 ```
 
-## Making API requests with react
+### Making API requests with react
 React itself does NOT do network requests.  For this we need to use an external library like `axios` or
 the built-in function `fetch`.
 
-### Axios vs Fetch
+#### Axios vs Fetch
 - `fetch` is a built-in function to do network requests that does not add any overhead. However, it is very basic
 and requires coding some boilerplate code.
 - `axios` is a higher level 3rd party library that handles requests in a very predictable way.  Axios is recommended
 to perform the API requests on react apps.
     - `npm install --save axios`  
     
-### Working with JS Promises
+#### Working with JS Promises
 A promise is an object that represents the eventual completion or failure of an asynchronous operation.  Promises are
 frequently used in JS for network requests and it is up to the developers to code what should happen when the
 promise succeeds or fails.
@@ -641,7 +641,7 @@ In the context of API requests, there are 2 options for handling promises: 1) `p
 
 Note: more information can be found on video _"92. Handling Requests with Async Await"_ from Stephen Grider's course.
 
-#### Option 1: Using `promise.then()`
+##### Option 1: Using `promise.then()`
 The `then` method allows us to give the promise a callback to execute once the promise succeeds.
 ```jsx harmony
 class App extends React.Component {
@@ -664,7 +664,7 @@ class App extends React.Component {
 }
 ```
 
-#### Option 2: Using `async` and `await`
+##### Option 2: Using `async` and `await`
 This is a newer syntax that allows us to write simpler and cleaner code.
 ```jsx harmony
 class App extends React.Component {
@@ -686,7 +686,7 @@ class App extends React.Component {
     render() { /*...*/ }
 }
 ```
-### Creating Custom API Clients with axios
+#### Creating Custom API Clients with axios
 With axios, we can create a dedicated client that is configured to make requests with whatever configuration we 
 set it up. This allows us to extract all the configuration, and authentication logic for a particular service
 into a dedicated file.
@@ -716,7 +716,30 @@ class App extends React.Component {
     };
 }
 ```
+### Rendering a List of Components
+Rendering lists of information is very common in any application. The most common way of doing it is using
+the JS `map` function over an array of elements that contain the data of what we want to display.  For example:
+```jsx harmony
+const ImageList = (props) => {
+    // In this example props.images = [
+    //                                   {id: ..., url: ..., description: ...},
+    //                                   {id: ..., url: ..., description: ...}
+    //                                ]
 
+    // The arrow function inside the map is making use of destructuring assignment of each image object.
+    // That is equivalent to (image) => {... image.id   .... image.urls.regular ...}
+    const images = props.images.map(({id, urls, description}) => {
+        return <img key={id} src={urls.regular} alt={description} />;
+    });
+    return <div>{images}</div>;
+};
+```
+__Warning:__"Each child in array or iterator should have a unique `key` prop". This is a warning given by react
+if we omit the 'key' prop on each element of the list. 
+- The `key` prop helps react figure out which changes need to be done on the DOM.
+- Giving a key increases the performance of the front-end, but it is solely a performance consideration.
+- The `key` only needs to be assigned to the outer-most / root HTML tag of each of the elements in the list.
+- Only collections require the `key` prop. 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
