@@ -740,6 +740,64 @@ if we omit the 'key' prop on each element of the list.
 - Giving a key increases the performance of the front-end, but it is solely a performance consideration.
 - The `key` only needs to be assigned to the outer-most / root HTML tag of each of the elements in the list.
 - Only collections require the `key` prop. 
+
+### The React Reference System
+- Refs give access to a single DOM element.
+- We create refs in the constructor, store them in an instance variables and assign them to a particular
+jsx as props.
+    - Theoretically, we could save a ref to the state, but that is not necessary because refs don't change.
+    - Only things that change should be stored in `state`.
+- `this.myRef.current` is a handle to the HTML element that was rendered in the DOM.
+```jsx harmony
+class ImageCard extends React.Component {
+
+    // 1. Refs need to be created in the constructor
+    constructor(props) {
+        super(props);
+        // 2. Create a ref and store it in the `imageRef` instance variable
+        this.imageRef = React.createRef();
+    }
+
+    componentDidMount() {
+        // 4. Use ref to access the DOM element
+        console.log(this.imageRef.current);
+    }
+
+    render () {
+        const { description, urls } = this.props.image;
+        return (
+            <div>
+                {/* 3. Assign  ref to jsx element */}
+                <img ref={this.imageRef}
+                     src={urls.regular}
+                     alt={description} />
+            </div>
+        )
+    }
+}
+```
+
+### Manipulation of CSS through React
+If we want our React app to change some styling, we need to do it as __inline styles__ in the JSX elements. 
+For example: 
+```jsx harmony
+class ImageCard extends React.Component {    
+    // ...
+
+    render () {
+       // ...
+        return (
+            // Add CSS inline through React
+            <div style={{gridRowEnd: `span ${this.state.spans}`}}>
+                <img ref={this.imageRef}
+                     src={urls.regular}
+                     alt={description} />
+            </div>
+        )
+    }
+}
+```
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
