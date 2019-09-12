@@ -5,8 +5,7 @@ class SearchBar extends React.Component {
 
    onFormSubmit = (event) => {
        event.preventDefault();
-       // TODO: use app callback to search api
-       console.log(this.state.term);
+       this.props.onSearchSubmit(this.state.term);
    };
 
     render() {
