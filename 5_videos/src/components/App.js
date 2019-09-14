@@ -4,7 +4,7 @@ import VideoList from "./VideoList";
 import youtube from "../apis/youtube";
 
 class App extends React.Component {
-    state = { videos: [] };
+    state = { videos: [], selectedVideo: null};
 
     fetchVideos = async (term) => {
         console.log(`Fetching videos for "${term}"`);
@@ -13,11 +13,15 @@ class App extends React.Component {
         this.setState({videos: response.data.items});
     };
 
+    onVideoSelect = (video) => {
+      console.log('From app', video);
+    };
+
     render() {
         return (
             <div className='ui container'>
                 <SearchBar onSearchSubmit={this.fetchVideos}/>
-                <VideoList videos={this.state.videos}/>
+                <VideoList videos={this.state.videos} onVideoSelect={this.onVideoSelect} />
             </div>
         );
     }
