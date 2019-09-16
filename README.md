@@ -798,6 +798,13 @@ class ImageCard extends React.Component {
 }
 ```
 
+## Working with Redux
+### What is Redux?
+- A state management library ("state" as in React state). Redux is in charge of handling the data inside our applications.
+- Makes creating _complex_ apps easier.
+- NOT required to create a React app.
+- NOT specifically design for React, can work with other frameworks.
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
