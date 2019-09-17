@@ -810,6 +810,7 @@ The Udemy course has a great detailed explanation of Redux by analogy using an i
 the full details. I put a summary of the analogy here to refresh your memory.
 
 ![Insurance Analogy](./diagrams/redux-insurance-analogy.svg)
+![Insurance Paralell](./diagrams/insurance-parallel.svg)
 
 
 ----------------------------------------------------------------
