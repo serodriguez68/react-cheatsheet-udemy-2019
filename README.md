@@ -870,12 +870,17 @@ const claimsHistory = (oldListOfClaims = [], action) => {
 The REDUX STORE is a a data store that holds a collection of `reducers` that define how the store reacts
 to `actions` created by `action creators`.
 
+- The ONLY way to modify the data in the store is through the `dispatch` function (which in turn holds the `reducers`)
+we have defined. 
+    - We will NEVER write code like `store.state = {...}`
+
 ```jsx harmony
 // From Redux, take createStore and combineReducers
 import Redux from 'redux';
 const { createStore, combineReducers } = Redux;
 
 // Outline the collection of reducers that the store will need
+// The name of the keys determine the name of the key in the store, the value is the reducer function
 const ourDepartments = combineReducers({
   accounting: accounting,
   claimsHistory: claimsHistory,
