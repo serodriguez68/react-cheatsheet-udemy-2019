@@ -805,12 +805,19 @@ class ImageCard extends React.Component {
 - NOT required to create a React app.
 - NOT specifically design for React, can work with other frameworks.
 
+### Redux benefits
+Redux helps applications to keep complexity under control as they grow.
+TODO: insert diagram
+
 ### Redux by analogy
 The Udemy course has a great detailed explanation of Redux by analogy using an insurance company. Watch that to get
 the full details. I put a summary of the analogy here to refresh your memory.
 
 ![Insurance Analogy](./diagrams/redux-insurance-analogy.svg)
 ![Insurance Paralell](./diagrams/insurance-parallel.svg)
+
+### The Redux Cycle 
+TODO: insert diagram
 
 
 ### Action Creators
