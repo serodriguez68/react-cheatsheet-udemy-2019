@@ -805,6 +805,12 @@ class ImageCard extends React.Component {
 - NOT required to create a React app.
 - NOT specifically design for React, can work with other frameworks.
 
+### Redux by analogy
+The Udemy course has a great detailed explanation of Redux by analogy using an insurance company. Watch that to get
+the full details. I put a summary of the analogy here to refresh your memory.
+
+
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
