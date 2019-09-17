@@ -813,6 +813,28 @@ the full details. I put a summary of the analogy here to refresh your memory.
 ![Insurance Paralell](./diagrams/insurance-parallel.svg)
 
 
+### Action Creators
+Action creators are the person dropping the form in our analogy. They are methods that take in some arguments and
+return an action.
+
+An action is just a JS Object that follows a very particular structure.  It has a `type` that represents the
+type of action it is (e.g. `CREATE_CLAIM`), and a `payload`, that contains all the extra information that
+the action requires.
+
+```jsx harmony
+// ACTION CREATOR: People dropping off a form
+// One action creator for each type of action in our app
+const createPolicy = (name, amount) => {
+  return {//Action (a from in our analogy)
+    type: 'CREATE_POLICY',
+    payload: {
+      name: name,
+      amount: amount
+    }
+  };
+};
+```
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
