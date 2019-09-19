@@ -822,7 +822,7 @@ the full details. I put a summary of the analogy here to refresh your memory.
 
 ### Action Creators
 Action creators are the person dropping the form in our analogy. They are methods that take in some arguments and
-return an action.
+return an action.  Actions are the ONLY way we can change the state in our redux store (i.e. `dispatch`ing actions).
 
 An action is just a JS Object that follows a very particular structure.  It has a `type` that represents the
 type of action it is (e.g. `CREATE_CLAIM`), and a `payload`, that contains all the extra information that
@@ -844,11 +844,11 @@ const createPolicy = (name, amount) => {
 
 ### Reducers
 Reducers map to departments in our analogy.  Each reducer: 
-- Receives all possible actions on the up and is in charge of listening to the actions of interest and creating a NEW
+- Receives all possible actions on the app and is in charge of listening to the actions of interest and creating a NEW
 slice of state given the old slice of state and the nature of the action.
     - DO NOT mutate the old slice of state.
-- If the action is of no interest to the reducer, it needs to return the slice of old state unchange.
-- It needs to initialize with a reasonable value the slice of state it manipulates.
+- If the action is of no interest to the reducer, it needs to return the slice of old state unchanged.
+- It needs to initialize the slice of state it manipulates with a reasonable value (e.g. an empty array).
 
 ```jsx harmony
 // REDUCERS - Depatments in our analogy
@@ -905,9 +905,54 @@ console.log(store.getState());
 // => {accounting: 120, claimsHistory: [], policies: ['Alex']}
 ```
 
-### Making Redux work with React
+## Making Redux work with React
+### Why do we need `react-redux`?
 We need the `react-redux` library to get both working together. Remember that Redux was no specifically designed
 for React. Install it by doing `npm install --save react-redux`
+
+- In general when using React with Redux, we will no longer require to store state within the components, since 
+the state is now stored within the Redux store.
+    - There are some use cases when we can need both Redux State and Component State. More on this later.
+
+### `Provider` and `Connect` components: the glue between React and Redux
+TODO: clarify this with code examples
+- There are 2 basic building blocks
+- Provider
+    - An instance that is initialized with the redux store for the app
+    - Top level component of the app (even the <App> component is dependent on provider)
+- Connect
+    - Every time we need a component to communicate with the Redux Store (through the Provider),
+    we need to wrap it in a `Connect` component.
+    - The connect component also provides de action creators to the wrapped components.
+
+### React with Redux Project Structure
+A React + Redux project typically has this structure
+- `/src`
+    - `/actions`: Contains all files related to action creators.  Typically contains a main
+    `index.js` file which is used as the import in other files.
+    - `/components`: All component-related files.
+    - `/reducers`: Reducer-related files. Also tend to include an `index.js` file.
+    - `index.js`: Sets up BOTH the react and redux sides of the app.
+
+### Named exports
+Allows us to export multiple functions from a single file.
+```jsx harmony
+// Named Export - src/actions/index.js - We export 2 functions
+export const selectSong = song => {
+    return {
+        type: 'SONG_SELECTED',
+        payload: song
+    };
+};
+
+export const someOtherActionCreator = () => {
+    // ...
+};
+```
+```jsx harmony
+// Importing a named export - some_other_file.js
+import { selectSong } from '../actions';
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
