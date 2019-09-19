@@ -912,7 +912,7 @@ for React. Install it by doing `npm install --save react-redux`
 
 - In general when using React with Redux, we will no longer require to store state within the components, since 
 the state is now stored within the Redux store.
-    - There are some use cases when we can need both Redux State and Component State. More on this later.
+    - There are some use cases when we can need both Redux State and Component State. TODO: More on this later.
 
 ### `Provider` and `Connect` components: the glue between React and Redux
 TODO: clarify this with code examples
