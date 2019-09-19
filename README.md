@@ -905,6 +905,10 @@ console.log(store.getState());
 // => {accounting: 120, claimsHistory: [], policies: ['Alex']}
 ```
 
+### Making Redux work with React
+We need the `react-redux` library to get both working together. Remember that Redux was no specifically designed
+for React. Install it by doing `npm install --save react-redux`
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
