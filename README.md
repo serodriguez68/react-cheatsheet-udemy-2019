@@ -917,7 +917,7 @@ the state is now stored within the Redux store.
 ### `Provider` and `Connect` components: the glue between React and Redux
 
 The `react-redux` library provides 2 "glue" components to help React and Redux interact.
-TODO: Insert diagram
+![Provider Connect Overview](./diagrams/provider-connect-overview.svg)
 
 __`Provider`__
 - Holds the redux store, that in turn is created using the combined reducers.
