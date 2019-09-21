@@ -10,7 +10,7 @@ const App = () => {
                     <SongList />
                 </div>
                 <div className="column eight wide">
-                    <SongDetail />
+                    <SongDetail noSongText="Please select a song" />
                 </div>
             </div>
         </div>
