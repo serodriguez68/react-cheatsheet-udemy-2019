@@ -1,3 +1,5 @@
+import { combineReducers } from 'redux';
+
 // This reducer is a bit weird because we are hard-coding the list of songs.
 // This is just for illustration purposes
 export const songsReducer = () => {
@@ -15,3 +17,8 @@ export const selectedSong = (selectedSong=null, action) => {
   }
   return selectedSong;
 };
+
+export default combineReducers({
+    songs: songsReducer,
+    selectedSong: selectedSong
+});

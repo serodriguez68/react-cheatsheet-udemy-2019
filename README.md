@@ -915,15 +915,18 @@ the state is now stored within the Redux store.
     - There are some use cases when we can need both Redux State and Component State. TODO: More on this later.
 
 ### `Provider` and `Connect` components: the glue between React and Redux
-TODO: clarify this with code examples
-- There are 2 basic building blocks
-- Provider
-    - An instance that is initialized with the redux store for the app
-    - Top level component of the app (even the <App> component is dependent on provider)
-- Connect
-    - Every time we need a component to communicate with the Redux Store (through the Provider),
+
+The `react-redux` library provides 2 "glue" components to help React and Redux interact.
+TODO: Insert diagram
+
+__`Provider`__
+- Holds the redux store, that in turn is created using the combined reducers.
+- Is the top level component of the app. See [Wiring up the provider](#wiring-up-the-provider)
+
+__`Connect`__
+- Every time we need a component to communicate with the Redux Store (through the Provider),
     we need to wrap it in a `Connect` component.
-    - The connect component also provides de action creators to the wrapped components.
+- The connect component also provides the action creators to the wrapped components.
 
 ### React with Redux Project Structure
 A React + Redux project typically has this structure
@@ -953,6 +956,45 @@ export const someOtherActionCreator = () => {
 // Importing a named export - some_other_file.js
 import { selectSong } from '../actions';
 ```
+
+### Wiring up the Provider
+1. Combine reducers using the `combineReducers` method from redux.
+```jsx harmony
+// ./reducers/index.js
+import { combineReducers } from 'redux';
+
+export const songsReducer = () => {
+    // ...
+};
+
+export const selectedSong = (selectedSong=null, action) => {
+ // ...
+};
+
+export default combineReducers({
+    songs: songsReducer,
+    selectedSong: selectedSong
+});
+```
+2. Wrap the top level App component with a `Provider` component and pass in a __redux store__ created from
+the combined reducers.
+```jsx harmony
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+
+import App from './components/App';
+import reducers from './reducers';
+
+ReactDOM.render(
+    <Provider store={createStore(reducers)}>
+        <App/>
+    </Provider>,
+    document.querySelector('#root')
+);
+
+``` 
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
