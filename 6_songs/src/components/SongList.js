@@ -16,7 +16,7 @@ class SongList extends React.Component {
                             Select
                         </button>
                     </div>
-                    <div className="content">{`${song.title} - ${song.duration}`}</div>
+                    <div className="content">{`${song.title}`}</div>
                 </div>
             );
         });

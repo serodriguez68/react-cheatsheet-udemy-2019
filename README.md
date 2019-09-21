@@ -997,7 +997,14 @@ ReactDOM.render(
 
 ### Wiring up Connect
 `Connect` needs to be wired up for every component that is dependent on some piece of state inside the
-Redux Store or that needs to trigger some action that updates the redux state (using action creators).
+Redux Store OR that needs to trigger some action that updates the redux state (using action creators).
+
+Note that components that have been wired up with `Connect` will be automatically re-rendered when the global
+store changes.
+
+There are 2 scenarios: __Class bases components__ and __Functional Components__.
+
+__Class Based Components__
 
 There are 2 key things to wire up:
 1. How our component receives information from the global redux state: see `mapStateToProps` below.
@@ -1052,6 +1059,30 @@ const mapStateToProps = (state) => {
 //     props. That is why we can call `this.props.selectSong()` directly without having to use `dispatch`
 export default connect(mapStateToProps, {selectSong})(SongList);
 ``` 
+
+__Functional Components__
+
+Simpler than class-based.  We only need to `mapStateToProps` and use the `connect` function.
+```jsx harmony
+import React from 'react';
+import { connect } from 'react-redux';
+
+const SongDetail = (props) => {
+        return (
+            <div>
+                <div>{props.selectedSong.title}</div>
+                <div>{props.selectedSong.duration}</div>
+            </div>
+        );
+};
+
+const mapStateToProps = state => {
+  return {selectedSong: state.selectedSong};
+};
+
+export default connect(mapStateToProps)(SongDetail);
+```
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
