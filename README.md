@@ -1157,6 +1157,46 @@ All network requests fall into this category.
     - OR they can return a function and redux-thunk will call it for us.
 ![what is redux thunk](./diagrams/redux-thunk-how-it-works.svg)
 
+### How to wire-up redux-thunk to the store
+```jsx harmony
+// src/index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import {Provider} from 'react-redux';
+import {createStore, applyMiddleware} from 'redux';
+import thunk from "redux-thunk";
+
+import App from './components/App';
+import reducers from './reducers';
+
+const store = createStore(reducers, applyMiddleware(thunk));
+
+ReactDOM.render(
+    <Provider store={store}>
+        <App/>
+    </Provider>,
+    document.querySelector('#root')
+);
+```
+
+### How to create an `action-creator` that makes an API call
+```jsx harmony
+// actions/index.js
+import jsonPlaceholder from "../apis/jsonPlaceholder";
+
+export const fetchPosts =  () => {
+    // We are going to return a function so that redux-thunk uses it.
+    // This function will get called by redux-thunk with the dispatch and getState functions
+    // injected as arguments.
+    // We don't care about what the inner function returns, the only thing that we care is that the inner function
+    // dispatches an action.
+    return async (dispatch, getState) => {
+            const response = await jsonPlaceholder.get('/posts');
+            dispatch({ type: 'FETCH_POSTS', payload: response});
+    };
+};
+``` 
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
