@@ -1147,9 +1147,10 @@ You won't see an error in this case, but the code won't work.
 The code is invalid because by the time our action object get to a reducer we won't have
 fetched the data from the API and the payload is actually a promise (not data).
 
-### Syncrhronous vs Asynchonous action creators
-- Sync: supported by default
-- Async: needs middleware. all network request
+### Synchronous vs Asynchronous action creators
+- Synchronous: a "vanilla" function that returns an action immediately.
+- Asynchronous: some action creator that needs time to resolve. NEEDS middleware (not supported by default in Redux). 
+All network requests fall into this category.
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
