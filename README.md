@@ -1094,9 +1094,6 @@ The play a role in the Redux cycle.
 - There are many open-source middlewares.
 - Most popular middlewares are for dealing with async actions (like `redux-thunk`).
 
-### What is Redux-thunk
-A middleware that helps Redux make network requests.
-
 ### General steps for loading data into a Redux app from an external API
 ![Redux loading data from an external API](./diagrams/redux-loading-data-from-api.svg)
 
@@ -1151,6 +1148,14 @@ fetched the data from the API and the payload is actually a promise (not data).
 - Synchronous: a "vanilla" function that returns an action immediately.
 - Asynchronous: some action creator that needs time to resolve. NEEDS middleware (not supported by default in Redux). 
 All network requests fall into this category.
+
+### What is Redux-thunk
+- `redux-thunk` is a GENERAL PURPOSE middleware. It is NOT only for async requests.
+- All that `redux-thunk` does is change the rules of what action creators can return. With
+`redux-thunk`:
+    - Action creators CAN return actions (i.e. play JS objects with a `type` property and optionally a `payload`).
+    - OR they can return a function and redux-thunk will call it for us.
+![what is redux thunk](./diagrams/redux-thunk-how-it-works.svg)
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
