@@ -1084,13 +1084,60 @@ export default connect(mapStateToProps)(SongDetail);
 ```
 ## Making API with Redux and Redux-Thunk
 ### What is a Redux Middleware
-Redux Middlewares are functions that slightly change the behaviour of a Redux Store, adding new capabilites to it.
+Redux Middlewares are functions that slightly change the behaviour of a Redux Store, adding new capabilities to it.
 
 ### What is Redux-thunk
 A middleware that helps Redux make network requests.
 
 ### General steps for loading data into a Redux app from an external API
 ![Redux loading data from an external API](./diagrams/redux-loading-data-from-api.svg)
+
+
+### Common pitfall: making network requests inside action creators
+This common pitfall also serves as a motivation for `redux-thunk`.
+
+#### Common Invalid code 1
+You may feel tempted to make the API network request on the action creator, but his is invalid 
+redux code. The following code is invalid and will lead to the error shown below.
+```jsx harmony
+// actions/index.js
+import jsonPlaceholder from "../apis/jsonPlaceholder";
+
+export const fetchPosts = async () => {
+    // This is invalid redux code. NO network requests in action creators.
+    const response = await jsonPlaceholder.get('/posts');
+    return {
+        type: 'FETCH_POSTS',
+        payload: response
+    };
+};
+```
+`Error: Actions must be plain objects. Use custom middleware for async actions.`
+
+The code is invalid because in redux, action creators MUST return PLAIN JS OBJECT with a type property and an optional payload.
+The `async` `await` in `fetchPosts = async() => { await...}` actually returns gets transpiled down into a
+ complicated function in ES2015 that, while the network request is being done returns a different thing
+ that has nothing to do with our intended plain JS object (to make it obvious, transpile it to ES2015).
+ 
+ #### Common Invalid code 2
+ To fix the previous code, you may want to directly do the request without `async` and `await`, like shown next.
+ ```jsx harmony
+ // actions/index.js
+ import jsonPlaceholder from "../apis/jsonPlaceholder";
+ 
+ export const fetchPosts =  () => {
+     // Remember, axios (or any network library) returns a PROMISE
+     const promise =  jsonPlaceholder.get('/posts');
+     return {
+         type: 'FETCH_POSTS',
+         payload: promise
+     };
+ };
+ ```
+You won't see an error in this case, but the code won't work.
+
+The code is invalid because by the time our action object get to a reducer we won't have
+fetched the data from the API and the payload is actually a promise (not data).
 
 
 ----------------------------------------------------------------
