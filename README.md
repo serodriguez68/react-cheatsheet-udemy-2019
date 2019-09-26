@@ -1085,6 +1085,14 @@ export default connect(mapStateToProps)(SongDetail);
 ## Making API with Redux and Redux-Thunk
 ### What is a Redux Middleware
 Redux Middlewares are functions that slightly change the behaviour of a Redux Store, adding new capabilities to it.
+The play a role in the Redux cycle.
+
+![what is a middleware](./diagrams/redux-what-is-middleware.svg)
+
+- A middleware is a plain js function that gets called with every action that you `dispatch`.
+- The middleware function has the ability to STOP, MODIFY or mess around with the action (e.g. print it to console).
+- There are many open-source middlewares.
+- Most popular middlewares are for dealing with async actions (like `redux-thunk`).
 
 ### What is Redux-thunk
 A middleware that helps Redux make network requests.
@@ -1139,6 +1147,9 @@ You won't see an error in this case, but the code won't work.
 The code is invalid because by the time our action object get to a reducer we won't have
 fetched the data from the API and the payload is actually a promise (not data).
 
+### Syncrhronous vs Asynchonous action creators
+- Sync: supported by default
+- Async: needs middleware. all network request
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
