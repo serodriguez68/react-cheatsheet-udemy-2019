@@ -1082,6 +1082,16 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps)(SongDetail);
 ```
+## Making API with Redux and Redux-Thunk
+### What is a Redux Middleware
+Redux Middlewares are functions that slightly change the behaviour of a Redux Store, adding new capabilites to it.
+
+### What is Redux-thunk
+A middleware that helps Redux make network requests.
+
+### General steps for loading data into a Redux app from an external API
+![Redux loading data from an external API](./diagrams/redux-loading-data-from-api.svg)
+
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
