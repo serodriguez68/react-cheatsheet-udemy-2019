@@ -1054,7 +1054,7 @@ class SongList extends React.Component {
 // This is how we configure that we want to get this connect component to be notified of changes
 // on a particular piece of state from the whole redux store.
 // By convention we call this function `mapStateToProps`
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
     // This object is going to be mapped to the props inside the SongList.
     // i.e. Inside Songlist this.props === { songs: state.songs }
     return { songs: state.songs };
@@ -1090,6 +1090,39 @@ const mapStateToProps = state => {
 
 export default connect(mapStateToProps)(SongDetail);
 ```
+
+### Doing pre-calculations inside `mapStateToProps`
+In some cases, we need to do some bits of pre-calculation logic to map the redux global state into the 
+props a particular component cares about.  `mapStateToProps` is a great place to do that pre-calculation and only
+pass to the component the minimum data it needs.
+
+The following example illustrates how we extract the particular `user` a component instance cares about form 
+an array of users.
+```jsx harmony
+import React from 'react';
+import {connect} from 'react-redux';
+//...
+
+class UserHeader extends React.Component {
+    // ...
+    render(){
+        // ...
+        return <div>{user.name}</div>
+    }
+}
+
+// mapStateToProps gets called with 2 args: 
+// 1) The complete redux store, 
+// 2) The props that have been injected to the particular instance of the component (e.g. <UserHeader userId=2/> )
+// With those 2 pieces of information, we can do any pre-calculation needed to give the component just the right
+// data from the redux store.
+const mapStateToProps = (state, ownProps) => {
+    const user = state.users.find( user => user.id === ownProps.userId);
+    return { user: user };
+};
+export default connect(mapStateToProps, {fetchUser})(UserHeader);
+```
+
 ## Making API with Redux and Redux-Thunk
 ### What is a Redux Middleware
 Redux Middlewares are functions that slightly change the behaviour of a Redux Store, adding new capabilities to it.
