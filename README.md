@@ -845,8 +845,12 @@ const createPolicy = (name, amount) => {
 ### Reducers
 Reducers map to departments in our analogy.  Each reducer: 
 - Receives all possible actions on the app and is in charge of listening to the actions of interest and creating a NEW
-slice of state given the old slice of state and the nature of the action.
-    - DO NOT mutate the old slice of state.
+slice of state given the old **slice**of state and the nature of the action.
+    - Note that the reducer receives its old SLICE of state, NOT the complete store.
+    - DO NOT mutate the old slice of state, create a NEW slice of state. See [these patterns.](#patterns-for-safely-manipulating-state-in-reducers-without-mutation) 
+    - Must return ANY value besides `undefined` (`null` is ok).
+    - A reducer must be a PURE FUNCTION. It must NOT reach "out of itself" to decide what to return. 
+        - e.g. NOT network requests, NOT DOM traversing, NOT read from hard-drive.
 - If the action is of no interest to the reducer, it needs to return the slice of old state unchanged.
 - It needs to initialize the slice of state it manipulates with a reasonable value (e.g. an empty array).
 
@@ -873,6 +877,10 @@ const claimsHistory = (oldListOfClaims = [], action) => {
 
 // const accounting = ...
 ```
+
+#### Patterns for safely manipulating state in reducers without mutation
+![Safe reducer patterns](./diagrams/reducers-how-to-avoid-mutating-state.svg)
+
 ### Creating and interacting with the Redux Store
 The REDUX STORE is a a data store that holds a collection of `reducers` that define how the store reacts
 to `actions` created by `action creators`.
