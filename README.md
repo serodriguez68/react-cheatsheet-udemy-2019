@@ -1238,6 +1238,88 @@ export const fetchPosts =  () => {
 };
 ``` 
 
+### Toolkit: Avoiding repeated requests with memoization
+Memoization can be used to 'cache' repeated outgoing requests and avoid an API getting called
+more than one time for a particular parameter.
+
+This can also be accomplished manually by [calling action creators within action creators](#calling-action-creators-within-action-creators),
+but the implications are different.
+
+**Pros**
+- Does not repeat requests for users that have already been fetched (no N+1)
+
+**Cons**
+- The memoized code is hard to understand.
+- If we legitimately wanted to re-fetch a user (for example if his data changed on the server), we cannot do it.
+
+```jsx harmony
+export const fetchUser = id => {
+    return dispatch => {
+        return _fetchUser(id, dispatch);
+    };
+};
+// _fetchUser is a memoized function. It gets memoized for every parameter combination.
+// i.e. _fetchUser(1, myDispatch) ! will NOT memoize _fetchUser(2, myDispatch)
+const _fetchUser = _.memoize((async (id, dispatch) => {
+    const response = await jsonPlaceholder.get(`/users/${id}`);
+    dispatch({type: 'FETCH_USER', payload: response.data});
+}));
+```
+
+### Calling action creators within action creators
+An alternative and more standard pattern to [memoization](#toolkit-avoiding-repeated-requests-with-memoization
+) for avoiding repeated requests is to call action creators within other action creators.
+
+*Pros*
+- Re-use other smaller action creators in case we need to use them stand-alone
+- Allow to re-fetch data if data in server changes.
+
+*Cons*
+- Can be tricky to understand but it makes sense. Revise [the way redux-thunk works](#what-is-redux-thunk)
+while looking at this code and everything should make sense.
+
+In the following example, `fetchPosts` might return many posts from the same user and we want to make sure
+we do not fetch the info for a given user more than once. 
+
+```jsx harmony
+// This "combo" action creators allow us to do custom logic and control the amount of calls that we do
+export const fetchPostsAndUsers = () => {
+    return async (dispatch, getState) => {
+
+        // Hard to understand: Whenever we call an action creator within another action creator, we need to manually
+        // dispatch the action and let redux-thunk handle the rest. 
+        // (i.e. if it is a JS object, it will send them to  the reducers.  If it is a function, it will call it.)
+        // In this example `fetchPosts()` returns an inner function. Redux-thunk will call it and that 
+        // function in turn will dispatch whatever it needs to dispatch.
+        await dispatch(fetchPosts()); 
+        // We await for the API call to be completed before continuing, since we need the
+        // data from fetchPosts for doing the processing.
+
+        // Do some processing. eg find only the unique user Ids
+        const allUserIds = _.map(getState().posts, 'userId');
+        const userIds = _.uniq(allUserIds);
+
+        // Call another action creator to fetch users
+        // We don't have to use await because we no longer care when the user actually get's fetched.
+        userIds.forEach( id => dispatch(fetchUser(id)));
+    }
+};
+
+export const fetchPosts =  () => {
+    return async (dispatch, getState) => {
+            const response = await jsonPlaceholder.get('/posts');
+            dispatch({ type: 'FETCH_POSTS', payload: response.data });
+    };
+};
+
+export const fetchUser = (id) => {
+    return async (dispatch, getState) => {
+        const response = await jsonPlaceholder.get(`/users/${id}`);
+        dispatch({type: 'FETCH_USER', payload: response.data});
+    };
+};
+```
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
