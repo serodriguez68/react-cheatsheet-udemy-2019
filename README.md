@@ -1320,6 +1320,93 @@ export const fetchUser = (id) => {
 };
 ```
 
+### Handling multiple pages with React-Router
+#### Installing React-Router
+
+`npm install --save react-router-dom`.
+ 
+Make sure the "-dom is there".  We NEVER want to install `react-router` by itself. We want a higher
+level package:
+- `react-router-dom`: for DOM react (even if we use Redux).
+- `react-router-native`: for react native.
+- `react-router-redux`: Bindings between Redux and React Router. 100% not necessary, and not recommended. Stephen
+Grider recommends using  `react-router-dom` even in Redux projects.
+
+#### Overview of how does React-Router-Dom work
+We interact with react-router-dom through 3 components given in the library: 
+- `BrowserRouter`: internally keeps track of all your navigation history and figures out the `path` of the current URL.
+- `Route`: compares the actual path with the `path` prop to render one of our components.
+    - Note that if multiple `Route` components match the URL, all matching components get rendered.
+- `Link`: see [navigation](#navigation-in-react-router).
+
+```jsx harmony
+import React from 'react';
+import { BrowserRouter, Route, Link } from 'react-router-dom';
+import PageOne from './PageOne';
+import PageTwo from './PageTwo';
+
+const App = () => {
+    return(
+        <div>
+            <BrowserRouter>
+                { /* Browser Router can only take one child, hence the div */}
+                <div>
+                    <Route path="/" exact component={PageOne}/>
+                    <Route path="/pagetwo" component={PageTwo} />
+                </div>
+            </BrowserRouter>
+        </div>
+    );
+};
+export default App;
+```
+#### Path Matching
+- Path matching is based on `currentPath.contains(pathInRoute)` string matching. 
+    - e.g. For URL "foo.com/page/5", The current path is "/page/5".  The matching would be `"/page/5".contains("/")  => yes`
+- The `exact` property in the `Route` component modifies the matching behaviour to exact matching.
+
+#### Navigation in react-router
+- We DON'T want to do a full page refresh to navigate, since it will trigger a __full reload__ of all the JS.
+    - All React/Redux state data gets lost on a full-page reload.
+- We make use of the `Link` component provided by 'react-router-dom'.
+    - Link still renders an `<a>` but prevents default, changes the URL in the browser and 
+    updates the `History` inside the `BrowserRouter`, triggering component re-rendering.
+```jsx harmony
+import React from 'react';
+import { BrowserRouter, Route, Link } from 'react-router-dom';
+
+const PageOne = () => {
+    return (
+        <div>
+            PageOne
+            <Link to="/pagetwo">Navigate to Page Two</Link>
+        </div>
+    );
+};
+
+const PageTwo = () => {
+    return (
+        <div>
+            PageTwo
+            <Link to="/">Navigate to Page One</Link>
+        </div>
+    );
+};
+
+const App = () => {
+    return(
+        <div>
+            <BrowserRouter>
+                <div>
+                    <Route path="/" exact component={PageOne}/>
+                    <Route path="/pagetwo" component={PageTwo} />
+                </div>
+            </BrowserRouter>
+        </div>
+    );
+};
+```
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
