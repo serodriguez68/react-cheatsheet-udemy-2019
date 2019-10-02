@@ -1406,6 +1406,16 @@ const App = () => {
     );
 };
 ```
+#### Types of router in react-router-dom
+There are 3 types of router in react-router-dom. They exist to cater for different configurations of how the backend
+server serves the React application bundle.js.  Here is an illustration of the problem:
+ 
+![Why we need different types of routers](./diagrams/react-router-router-types-problem-setup.svg)
+
+##### Types of routers
+- `HashRouter`: the client manages it's URLs by appending a  # `example.com/#/foo`. In this format, the 
+full page reloads always point to the root so the backend needs to be configured to return the SPA from the index.
+- `MemoryRouter`: keeps state internally and does not modify the URL.  If the user refreshes, the react app goes back to the root.
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
