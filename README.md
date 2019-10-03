@@ -1371,6 +1371,8 @@ export default App;
 - We make use of the `Link` component provided by 'react-router-dom'.
     - Link still renders an `<a>` but prevents default, changes the URL in the browser and 
     updates the `History` inside the `BrowserRouter`, triggering component re-rendering.
+    - `Link` may be used inside any of the [router types](#types-of-routers), but it MUST be used inside a router.
+    (i.e. it cannot be used in a component that is not nested inside a router).
 ```jsx harmony
 import React from 'react';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
@@ -1406,6 +1408,7 @@ const App = () => {
     );
 };
 ```
+
 #### Types of router in react-router-dom
 There are 3 types of router in react-router-dom. They exist to cater for different configurations of how the backend
 server serves the React application bundle.js.  Here is an illustration of the problem:
