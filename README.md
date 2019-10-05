@@ -1420,6 +1420,119 @@ server serves the React application bundle.js.  Here is an illustration of the p
 full page reloads always point to the root so the backend needs to be configured to return the SPA from the index.
 - `MemoryRouter`: keeps state internally and does not modify the URL.  If the user refreshes, the react app goes back to the root.
 
+## Authentication with React using OAuth
+
+### Types of OAuth Authentication
+![Types of OAuth Authentication](./diagrams/types-of-oauth.svg)
+
+### OAuth for Browser Apps Flow Overview
+![OAuth for Browser Apps Flow Overview](./diagrams/oauth-for-browsers-flow.svg)
+
+
+### Configuring Google to use oAuth
+The Video _209. Creating OAuth Credentials_ from Udemy has a detailed step by step on how to create the credentials
+on the Google developer console.
+
+### Adding `gapi` to a vanilla React project
+To add the Google OAuth client library, you need to add it in the `<head>` of your HTML.
+```html
+<head>
+  <!-- ...  -->
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+```
+That loads the google api `gapi` in the window scope of the browser.
+
+#### React side of things
+
+In this example, we create a dedicated `GoogleAuth` component that will handle the authentication logic.
+
+We use `gapi.load` to load the specific part of Google's API library we are interested in (gapi is very big so
+developers need to download only the parts needed) and `initialize` the client with our configured credentials.
+
+`gapi.client.init` is an async call that returns a promise, so we can use `then` to put some custom logic
+for when the initialization process finishes.
+
+Additionally, we use the provided `auth.isSignedIn.listen` listener to add a callback that updates our state
+whenever the sign is status changes.
+
+Finally, we wire 2 `onClick` event handlers for the sign it and sign out buttons.
+
+```jsx harmony
+import React from 'react';
+
+class GoogleAuth extends React.Component {
+    // When the app first loads we don't know if the user is signed in or not, so we should not assume anything
+    state = { isSignedIn: null };
+
+    componentDidMount() {
+        // arg 1: What part of the gapi library we want to load
+        // arg 2: Callback of what to do once the load has finished
+        window.gapi.load('client:auth2', () => {
+            window.gapi.client.init({
+                // Given when you configure your console.developers.google.com console
+                clientId: `${process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}`,
+                // What info form the users do we want to get access to.
+                scope: 'email'
+            }).then(() => {
+                // window.gapi.client.init returns a promise. We use `then` to get save a reference to the
+                // auth instance in the component's state so that we can easily reference it later.
+                // The authInstance contains many convenient methods like
+                // - auth.signIn(): opens Google's authentication popup
+                // - auth.isSignedIn.get(): true if the user is signed in
+                // - auth.isSignedIn.listen(callback): a listener that is called when the isSignedIn status changes
+                this.auth = window.gapi.auth2.getAuthInstance();
+                this.setState({isSignedIn: this.auth.isSignedIn.get()});
+                this.auth.isSignedIn.listen(this.onAuthChange);
+            });
+        });
+    }
+
+    // Needs to be arrow function to bind `this` since it will be used as a callback.
+    onAuthChange = () => {
+        this.setState({isSignedIn: this.auth.isSignedIn.get()});
+    };
+
+    // Callback function for when the user clicks sign in
+    onSignIn = () => {
+      this.auth.signIn();
+    };
+
+    // Callback function for when the user clicks sign out
+    onSignOut = () => {
+      this.auth.signOut();
+    };
+
+    renderAuthButton() {
+        if(this.state.isSignedIn === null) {
+            return null; // A spinner could also work
+        } else if (this.state.isSignedIn) {
+            return (
+                <button onClick={this.onSignOut} className="ui red google button">
+                    <i className="google icon" />
+                    Sign Out
+                </button>
+            );
+        } else {
+            return (
+                <button onClick={this.onSignIn} className="ui red google button">
+                    <i className="google icon" />
+                    Sign In with Google
+                </button>
+            );
+        }
+    }
+
+    render() {
+        return (
+            <div>{this.renderAuthButton()}</div>
+        );
+    }
+}
+
+export default GoogleAuth;
+```
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
