@@ -1160,6 +1160,40 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {fetchUser})(UserHeader);
 ```
 
+### Debugging Redux with the Redux Dev Tools
+
+Redux Dev Tools is a Chrome / Firefox extension that is very helpful for debugging Redux applications.
+
+1. Install the Chrome / Firefox add-on named "Redux Dev Tools" through the extension marketplace.
+2. The dev tools require some wiring up on the code. Many sites like Airbnb leave the dev tools hooked in production.
+There is no problem on doing that and anybody with the devtools can use the tool on the site.
+```jsx harmony
+// ...
+import { createStore, applyMiddleware, compose } from "redux";
+// ...
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+const store = createStore(
+    reducers,
+    composeEnhancers(applyMiddleware())
+);
+
+ReactDOM.render(
+    <Provider store={store}>
+        <App/>
+    </Provider>,
+    document.querySelector('#root')
+);
+```
+
+Two key features of the devtools are:
+- The left panel of the devtools show a timeline of all the actions that have taken place. We can use "jump" to travel
+in time and revert the store to any of the moments. This will also change the app.
+- With `debug_session` (e.g. `http://localhost:3000/?debug_session=my_sesh`) we can persist the redux store across
+full browser reloads and store the session under a name that we can retrieve later (e.g. `my_sesh` in this example).
+    - We can have as many debug sessions stored as we want.
+    - To not use andy debug session, just ommit the `?debug_session=...` param in the URL.
+
 ## Making API with Redux and Redux-Thunk
 ### What is a Redux Middleware
 Redux Middlewares are functions that slightly change the behaviour of a Redux Store, adding new capabilities to it.
