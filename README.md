@@ -1433,7 +1433,7 @@ full page reloads always point to the root so the backend needs to be configured
 The Video _209. Creating OAuth Credentials_ from Udemy has a detailed step by step on how to create the credentials
 on the Google developer console.
 
-### Adding `gapi` to a vanilla React project
+### Adding Oauth to a vanilla React project
 To add the Google OAuth client library, you need to add it in the `<head>` of your HTML.
 ```html
 <head>
@@ -1494,12 +1494,12 @@ class GoogleAuth extends React.Component {
     };
 
     // Callback function for when the user clicks sign in
-    onSignIn = () => {
+    onSignInClick = () => {
       this.auth.signIn();
     };
 
     // Callback function for when the user clicks sign out
-    onSignOut = () => {
+    onSignOutClick = () => {
       this.auth.signOut();
     };
 
@@ -1508,14 +1508,14 @@ class GoogleAuth extends React.Component {
             return null; // A spinner could also work
         } else if (this.state.isSignedIn) {
             return (
-                <button onClick={this.onSignOut} className="ui red google button">
+                <button onClick={this.onSignOutClick} className="ui red google button">
                     <i className="google icon" />
                     Sign Out
                 </button>
             );
         } else {
             return (
-                <button onClick={this.onSignIn} className="ui red google button">
+                <button onClick={this.onSignInClick} className="ui red google button">
                     <i className="google icon" />
                     Sign In with Google
                 </button>
@@ -1533,6 +1533,30 @@ class GoogleAuth extends React.Component {
 export default GoogleAuth;
 ```
 
+Storing whether a user is signed in or not inside the state of a single component can potentially be a problem if
+there are other components that need to know that information.  To fix this [we can use Redux](#adding-oauth-to-a-react-redux-project)
+to store that information in the central redux store.
+
+### Adding OAuth to a React-Redux project
+
+- Motivation: We want to store whether a user is sign in or sign out in the redux store to allow any component to know 
+if a user is signed in or sign out.
+- There are 2 approaches to add OAuth to react-redux projects
+
+#### Approach 1: Centralize Authentication Logic into a component
+- (+) All Auth logic is centralized into a single component. Less wiring and good for future reference.
+- (-) It does not follow Redux conventions closely. In theory, only action creators should be responsible for changing
+the app's state. With this approach, the GoogleAuthComponent is changing the state of our app through
+the interaction with `gapi`.
+- This is the approach this course uses favoring future reference.
+![Approach 1: Centralize Authentication Logic into a component](./diagrams/oauth-in-react-redux-approach-1.svg)
+ 
+
+#### Approach 2: Distribute Authentication logic to follow Redux conventions
+- (+) Follows Redux Convention by interacting with `gapi` inside the action creators.
+- (-) The auth logic gets distributed among the action creators and the `GoogleAuthComponent`,
+ making it harder to trace for future reference.
+![Approach 2: Distribute Authentication logic to follow Redux conventions](./diagrams/oauth-in-react-redux-approach-2.svg)
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
