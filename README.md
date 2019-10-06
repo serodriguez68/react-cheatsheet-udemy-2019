@@ -881,6 +881,43 @@ const claimsHistory = (oldListOfClaims = [], action) => {
 #### Patterns for safely manipulating state in reducers without mutation
 ![Safe reducer patterns](./diagrams/reducers-how-to-avoid-mutating-state.svg)
 
+### Pattern: using a central place to define action types
+A very common bug that is hard to trace is making a typo in the action `type` between the action creators and the
+reducers.  To fix this, we can use a dedicated file `actions/types.js` to centrally declare all action types and use
+these in both action creators and reducers.
+
+```jsx harmony
+// ./src/actions/types
+export const SIGN_IN = 'SIGN_IN';
+export const SIGN_OUT = 'SIGN_OUT';
+
+// ./src/actions/index.js
+import {SIGN_IN, SIGN_OUT} from './types';
+
+export const signIn = () => {
+  return {
+      type: SIGN_IN
+  };
+};
+// ...
+
+// ./src/reducers/authReducer.js
+import {SIGN_IN, SIGN_OUT} from '../actions/types';
+
+const INITIAL_STATE = { isSignedIn: null };
+
+export default (signInState = INITIAL_STATE, action) => {
+    switch (action.type) {
+        case SIGN_IN:
+            return {...signInState, isSignedIn: true};
+        case SIGN_OUT:
+            return {...signInState, isSignedIn: false};
+        default:
+            return signInState;
+    }
+};
+``` 
+
 ### Creating and interacting with the Redux Store
 The REDUX STORE is a a data store that holds a collection of `reducers` that define how the store reacts
 to `actions` created by `action creators`.
