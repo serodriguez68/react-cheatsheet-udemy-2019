@@ -1631,7 +1631,8 @@ class GoogleAuth extends React.Component {
     // Needs to be arrow function to bind `this` since it will be used as a callback.
     onAuthChange = (isSignedIn) => {
         if (isSignedIn) {
-            this.props.signIn();
+            const userId = this.auth.currentUser.get().getId(); // Provides Google's userID
+            this.props.signIn(userId);
         } else {
             this.props.signOut();
         }
@@ -1687,31 +1688,34 @@ export default connect(
 ##### `Action Creators`
 ```jsx harmony
 // src/actions/index.js
-export const signIn = () => {
+import {SIGN_IN, SIGN_OUT} from './types';
+
+export const signIn = (userId) => {
   return {
-      type: 'SIGN_IN'
+      type: SIGN_IN,
+      payload: userId
   };
 };
 
 export const signOut = () => {
     return {
-        type: 'SIGN_OUT'
+        type: SIGN_OUT
     };
 };
 ```
 ##### `Reducers` 
 ```jsx harmony
 // src/reducers/authReducer
-const INITIAL_STATE = {
-  isSignedIn: null
-};
+import {SIGN_IN, SIGN_OUT} from '../actions/types';
+
+const INITIAL_STATE = { isSignedIn: null, userId: null };
 
 export default (signInState = INITIAL_STATE, action) => {
     switch (action.type) {
-        case 'SIGN_IN':
-            return {...signInState, isSignedIn: true};
-        case 'SIGN_OUT':
-            return {...signInState, isSignedIn: false};
+        case SIGN_IN:
+            return {...signInState, isSignedIn: true, userId: action.payload};
+        case SIGN_OUT:
+            return {...signInState, isSignedIn: false, userId: null};
         default:
             return signInState;
     }
