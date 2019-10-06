@@ -1550,13 +1550,152 @@ the app's state. With this approach, the GoogleAuthComponent is changing the sta
 the interaction with `gapi`.
 - This is the approach this course uses favoring future reference.
 ![Approach 1: Centralize Authentication Logic into a component](./diagrams/oauth-in-react-redux-approach-1.svg)
- 
 
+##### The `GoogleAuthComponent`
+Compared to the vanilla react approach, the `GoogleAuthComponent` needs some changes:
+- The notion of a user being signed in or not needs to be injected from the redux store using `mapStateToProps`.
+This entails that `isSignedIn` will no live inside the component's props
+- When a user attempts to sign in or sign out, `GoogleAuthComponent` must update the redux store by dispatching
+actions using the action creators.
+
+```jsx harmony
+import React from 'react';
+import { connect } from 'react-redux';
+import {signIn, signOut} from "../actions";
+
+
+class GoogleAuth extends React.Component {
+
+    componentDidMount() {
+        // arg 1: What part of the gapi library we want to load
+        // arg 2: Callback of what to do once the load has finished
+        window.gapi.load('client:auth2', () => {
+            window.gapi.client.init({
+                // Given when you configure your console.developers.google.com console
+                clientId: `${process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}`,
+                // What info form the users do we want to get access to.
+                scope: 'email'
+            }).then(() => {
+                // window.gapi.client.init returns a promise. We use `then` to get save a reference to the
+                // auth instance in the component's state so that we can easily reference it later.
+                // The authInstance contains many convenient methods like
+                // - auth.signIn(): opens Google's authentication popup
+                // - auth.isSignedIn.get(): true if the user is signed in
+                // - auth.isSignedIn.listen(callback): a listener that is called when the isSignedIn status changes.
+                //   The callback is called with a boolean that represents if the user is signed in
+                this.auth = window.gapi.auth2.getAuthInstance();
+                // Use action creators to update the redux store when the library finishes initialization
+                this.onAuthChange(this.auth.isSignedIn.get());
+                this.auth.isSignedIn.listen(this.onAuthChange);
+            });
+        });
+    }
+
+    // Needs to be arrow function to bind `this` since it will be used as a callback.
+    onAuthChange = (isSignedIn) => {
+        if (isSignedIn) {
+            this.props.signIn();
+        } else {
+            this.props.signOut();
+        }
+    };
+
+    // Callback function for when the user clicks sign in
+    onSignInClick = () => {
+      this.auth.signIn(); // Use wrapped-with-dispatch action creator
+    };
+
+    // Callback function for when the user clicks sign out
+    onSignOutClick = () => {
+      this.auth.signOut(); // Use wrapped-with-dispatch action creator
+    };
+
+    renderAuthButton() {
+        if(this.props.isSignedIn === null) {
+            return null; // A spinner could also work
+        } else if (this.props.isSignedIn) {
+            return (
+                <button onClick={this.onSignOutClick} className="ui red google button">
+                    <i className="google icon" />
+                    Sign Out
+                </button>
+            );
+        } else {
+            return (
+                <button onClick={this.onSignInClick} className="ui red google button">
+                    <i className="google icon" />
+                    Sign In with Google
+                </button>
+            );
+        }
+    }
+
+    render() {
+        return (
+            <div>{this.renderAuthButton()}</div>
+        );
+    }
+}
+
+const mapStateToProps = (state, ownProps) => {
+    return { isSignedIn: state.auth.isSignedIn };
+};
+
+export default connect(
+    mapStateToProps,
+    {signIn, signOut}
+)(GoogleAuth);
+```
+
+##### `Action Creators`
+```jsx harmony
+// src/actions/index.js
+export const signIn = () => {
+  return {
+      type: 'SIGN_IN'
+  };
+};
+
+export const signOut = () => {
+    return {
+        type: 'SIGN_OUT'
+    };
+};
+```
+##### `Reducers` 
+```jsx harmony
+// src/reducers/authReducer
+const INITIAL_STATE = {
+  isSignedIn: null
+};
+
+export default (signInState = INITIAL_STATE, action) => {
+    switch (action.type) {
+        case 'SIGN_IN':
+            return {...signInState, isSignedIn: true};
+        case 'SIGN_OUT':
+            return {...signInState, isSignedIn: false};
+        default:
+            return signInState;
+    }
+};
+
+// src/reducers/index.js
+import { combineReducers } from "redux";
+import authReducer from "./authReducer";
+
+export default combineReducers({
+    auth: authReducer
+});
+```
+ 
 #### Approach 2: Distribute Authentication logic to follow Redux conventions
 - (+) Follows Redux Convention by interacting with `gapi` inside the action creators.
 - (-) The auth logic gets distributed among the action creators and the `GoogleAuthComponent`,
  making it harder to trace for future reference.
+ - The code for this approach is not given in the course.
 ![Approach 2: Distribute Authentication logic to follow Redux conventions](./diagrams/oauth-in-react-redux-approach-2.svg)
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
