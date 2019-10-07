@@ -1771,6 +1771,41 @@ export default combineReducers({
  - The code for this approach is not given in the course.
 ![Approach 2: Distribute Authentication logic to follow Redux conventions](./diagrams/oauth-in-react-redux-approach-2.svg)
 
+### Redux Form
+
+#### Motivation
+Without Redux, we use [class-level state, event handlers and controlled elements](#controlled-vs-uncontrolled-elements) 
+to handle forms.
+
+With Redux, we favor the use of the central redux store instead of class-level state. Redux form helps us with this.
+
+#### Overview 
+![Redux Form Overview](./diagrams/redux-form-overview.svg)
+
+#### Documentation
+Redux form documentation is outstanding and available at redux-form.com.  
+The main highlights are the examples, here are some that you might find interesting:
+- [Synchronous Validation](https://redux-form.com/8.2.2/examples/syncvalidation/): Client-side validation of form
+- [Asynchronous Blur Validation](https://redux-form.com/8.2.2/examples/asyncvalidation/) How to run asynchronous server-side onBlur validation on your form when certain fields lose focus.
+- [Wizard Form](https://redux-form.com/8.2.2/examples/wizard/) How to create a multi-page "wizard" form.
+
+#### Setting up Redux Form
+The only setup we need to do is wire the provided redux-form reducer to our combineReducers.
+```jsx harmony
+import { combineReducers } from "redux";
+import { reducer as formReducer } from 'redux-form';
+import authReducer from "./authReducer";
+
+// We have to to assign the redux-form reducer to the 'form' key
+export default combineReducers({
+    auth: authReducer,
+    form: formReducer
+});
+```
+                  
+
+
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
