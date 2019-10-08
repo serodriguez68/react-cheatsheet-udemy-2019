@@ -1823,13 +1823,15 @@ class StreamCreate extends React.Component {
     //   2) A collection of event handlers that internally contain action creators that we need to wire to update
     //      the redux store.
     //   3) Any other custom props that we pass to the Field component that are NOT part of 1 and 2 (e.g. label in this case)
+    //   4) A `meta` property that contains a bunch of meta info about the field's state including the `error` we give
+    //      on validation
+    // formProps.input has the shape of:
+    // {name: "title", onBlur: ƒ, onChange: ƒ, onDragStart: ƒ, ..., value: "my title", meta: {error: '', ...}}
     renderInput (formProps) {
         // Under the hood we want to do something like this:
         // return <input  onChange={formProps.input.onChange} value={formProps.input.value }/>;
-        // However, the following syntax is a shorthand to wire everything inside the formProps.input to the
+        // However, the {...formProps.input} syntax is a shorthand to wire everything inside the formProps.input to the
         // input component using the same keys as the ones in the object.
-        // formProps.input has the shape of:
-        // {name: "title", onBlur: ƒ, onChange: ƒ, onDragStart: ƒ, onDrop: ƒ, onFocus: ƒ, value: "my title"}
         return (
             <div className="field">
                 <label>{formProps.label}</label>
@@ -1876,6 +1878,83 @@ export default reduxForm({
 })(StreamCreate);
 ```
 
+#### Client-side field validation
+![Client-side field validation](./diagrams/redux-form-field-validation.svg)
+
+The example shows how to do client-side validation that is rendered only after the field has been touched.
+
+```jsx harmony
+import React from 'react';
+// Field is a react component
+// reduxForm is a function
+import { Field, reduxForm } from "redux-form";
+
+class StreamCreate extends React.Component {
+    // formProps is an object that contains a `meta` property that contains a bunch of meta info about the field's 
+    // state including the `error` we give on validation and whether the field has been touched
+    renderInput = (formProps) => {
+        const meta = formProps.meta;
+        const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
+        return (
+            <div className={className}>
+                <label>{formProps.label}</label>
+                <input  {...formProps.input} />
+                { this.renderError(meta) }
+            </div>
+        );
+    };
+    
+    // Helper function to decide when to render errors
+     renderError ({error, touched}) {
+        if (error && touched) {
+            return (
+                <div className="ui error message">
+                    <div className="header">{error}</div>
+                </div>
+            );
+        }
+    };
+    
+    // handleSubmit does NOT call our custom onSubmit function if the form has errors.
+    onSubmit(formValues) {
+        // ...
+    }
+
+    render() {
+        return (
+            <form className="ui form" onSubmit={this.props.handleSubmit(this.onSubmit)}>
+                {/* The errors get injected into the formProps that are passed to the component functions */}
+                <Field name='title' component={this.renderInput} label="Enter Title"/>
+                <Field name='description' component={this.renderInput} label="Enter Description"/>
+                <button className="ui button primary">Submit</button>
+            </form>
+        );
+    }
+}
+
+// We define this function OUTSIDE the component and wire it in into the component
+// using the `reduxForm` function.
+// The function gets called with a `formValues` object that contains the values of each Field using the name as key
+// e.g. { title: 'My title', description: 'My description' }
+// If the fields are ok, then we must return an empty objects
+// Else we must return an object that contains the fields with errors along with a message. The match with the
+// Field names is VERY IMPORTANT
+const validate = (formValues) => {
+    const errors = {};
+    if (!formValues.title) {
+        errors.title = 'You must enter a title';
+    }
+    if (!formValues.description) {
+        errors.description = 'You must enter a description';
+    }
+    return errors;
+};
+
+export default reduxForm({
+    form: 'streamCreate',
+    validate: validate
+})(StreamCreate);
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to

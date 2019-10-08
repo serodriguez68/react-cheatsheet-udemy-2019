@@ -11,24 +11,41 @@ class StreamCreate extends React.Component {
     //   2) A collection of event handlers that internally contain action creators that we need to wire to update
     //      the redux store.
     //   3) Any other custom props that we pass to the Field component that are NOT part of 1 and 2 (e.g. label in this case)
-    renderInput (formProps) {
+    //   4) A `meta` property that contains a bunch of meta info about the field's state including the `error` we give
+    //      on validation
+    // formProps.input has the shape of:
+    // {name: "title", onBlur: ƒ, onChange: ƒ, onDragStart: ƒ, ..., value: "my title", meta: {error: '', ...}}
+    renderInput = (formProps) => {
         // Under the hood we want to do something like this:
         // return <input  onChange={formProps.input.onChange} value={formProps.input.value }/>;
-        // However, the following syntax is a shorthand to wire everything inside the formProps.input to the
+        // However, the {...formProps.input} syntax is a shorthand to wire everything inside the formProps.input to the
         // input component using the same keys as the ones in the object.
-        // formProps.input has the shape of:
-        // {name: "title", onBlur: ƒ, onChange: ƒ, onDragStart: ƒ, onDrop: ƒ, onFocus: ƒ, value: "my title"}
+        const meta = formProps.meta;
+        const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
         return (
-            <div className="field">
+            <div className={className}>
                 <label>{formProps.label}</label>
                 <input  {...formProps.input} />
+                { this.renderError(meta) }
             </div>
         );
-    }
+    };
+
+     renderError ({error, touched}) {
+        if (error && touched) {
+            return (
+                <div className="ui error message">
+                    <div className="header">{error}</div>
+                </div>
+            );
+        }
+    };
+
 
     // Our custom onSubmit function that will get wrapped by handleSubmit
-    // handleSubmit passes the formValues as an argument
+    // handleSubmit passes the formValues as an argument.
     // e.g. formValues:  {title: "my title", description: "my description"}
+    // handleSubmit does NOT call our custom onSubmit function if the form has errors.
     onSubmit(formValues) {
         // TODO: use redux-thunk to call an action creator that does an API request to post the data.
     }
@@ -38,7 +55,7 @@ class StreamCreate extends React.Component {
             // handleSubmit is injected by redux-form and wraps our custom 'onSubmit' function.
             // - It preventsDefault so that we don't need to do it
             // - It gets all the form values and passes them as an argument to our 'onSubmit' function.
-            <form className="ui form" onSubmit={this.props.handleSubmit(this.onSubmit)}>
+            <form className="ui form error" onSubmit={this.props.handleSubmit(this.onSubmit)}>
 
                 {/* Field is a wrapper for any type of input that wires up all the redux-form infrastructure required. */}
                 {/* Field needs some props: */}
@@ -53,12 +70,32 @@ class StreamCreate extends React.Component {
     }
 }
 
+// We define this function OUTSIDE the component and wire it in into the component
+// using the `reduxForm` function.
+// The function gets called with a `formValues` object that contains the values of each Field using the name as key
+// e.g. { title: 'My title', description: 'My description' }
+// If the fields are ok, then we must return an empty objects
+// Else we must return an object that contains the fields with errors along with a message. The match with the
+// Field names is VERY IMPORTANT
+const validate = (formValues) => {
+    const errors = {};
+    if (!formValues.title) {
+        errors.title = 'You must enter a title';
+    }
+    if (!formValues.description) {
+        errors.description = 'You must enter a description';
+    }
+    return errors;
+};
+
 
 // reduxForm is a function that replaces connect function from react-redux
 //   - It maps the state of the redux store to the props of the component
 //   - It injects the necessary action creators
 // reduxForm receives a single object to configure it
 //   - 'form' can be any string to describe the purpose of the form
+//   - 'validate' the validate function that will be used
 export default reduxForm({
-    form: 'streamCreate'
+    form: 'streamCreate',
+    validate: validate
 })(StreamCreate);
