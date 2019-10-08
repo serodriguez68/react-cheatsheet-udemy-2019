@@ -1772,6 +1772,7 @@ export default combineReducers({
 ![Approach 2: Distribute Authentication logic to follow Redux conventions](./diagrams/oauth-in-react-redux-approach-2.svg)
 
 ### Redux Form
+__The `8_streams/client/src/components/streams/StreamCreate.js` file has a fully annotated example of a form component.__
 
 #### Motivation
 Without Redux, we use [class-level state, event handlers and controlled elements](#controlled-vs-uncontrolled-elements) 
