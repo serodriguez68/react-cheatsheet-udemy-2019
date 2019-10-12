@@ -1,0 +1,26 @@
+{
+  "streams": [
+    {
+      "title": "my tit",
+      "description": "my desc",
+      "id": 1
+    },
+    {
+      "title": "sdfas",
+      "description": "asdfa",
+      "id": 2
+    },
+    {
+      "title": "my steam with user",
+      "description": "sd;kfljdas;lfkjksa;lfjlas;df",
+      "userId": "112396565881129506552",
+      "id": 3
+    },
+    {
+      "title": "Unexpected Behaviour",
+      "description": "didnt exect that",
+      "userId": "112396565881129506552",
+      "id": 4
+    }
+  ]
+}
