@@ -57,7 +57,6 @@ class StreamCreate extends React.Component {
     };
 
     render() {
-        console.log(this.props.history);
         return (
             // handleSubmit is injected by redux-form and wraps our custom 'onSubmit' function.
             // - It preventsDefault so that we don't need to do it
