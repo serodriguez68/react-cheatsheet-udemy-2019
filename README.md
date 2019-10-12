@@ -1396,7 +1396,7 @@ export const fetchUser = (id) => {
 
 `npm install --save react-router-dom`.
  
-Make sure the "-dom is there".  We NEVER want to install `react-router` by itself. We want a higher
+Make sure the "-dom" is there.  We NEVER want to install `react-router` by itself. We want a higher
 level package:
 - `react-router-dom`: for DOM react (even if we use Redux).
 - `react-router-native`: for react native.
@@ -1404,11 +1404,14 @@ level package:
 Grider recommends using  `react-router-dom` even in Redux projects.
 
 #### Overview of how does React-Router-Dom work
-We interact with react-router-dom through 3 components given in the library: 
-- `BrowserRouter`: internally keeps track of all your navigation history and figures out the `path` of the current URL.
+We interact with react-router-dom through 4 components given in the library: 
+- A `Router` (e.g. `BrowserRouter`): internally keeps track of all your navigation `history` and figures out the `path` of the current URL.
+- A `history` object that is held by the router and is in charge of storing and changing the URL. All routers except 
+the plain `Router` automatically create their own `history` objects 
+(see [types of routers](#types-of-routers) and [programmatic navigation](#programmatic-navigation)).
 - `Route`: compares the actual path with the `path` prop to render one of our components.
     - Note that if multiple `Route` components match the URL, all matching components get rendered.
-- `Link`: see [navigation](#navigation-in-react-router).
+- `Link`: see [navigation](#intentional-navigation-in-react-router).
 
 ```jsx harmony
 import React from 'react';
@@ -1436,8 +1439,9 @@ export default App;
     - e.g. For URL "foo.com/page/5", The current path is "/page/5".  The matching would be `"/page/5".contains("/")  => yes`
 - The `exact` property in the `Route` component modifies the matching behaviour to exact matching.
 
-#### Navigation in react-router
-##### Intentional Navigation: when the user clicks a button
+#### Intentional Navigation in react-router
+__i.e. when the user clicks a button__
+
 - We DON'T want to do a full page refresh to navigate, since it will trigger a __full reload__ of all the JS.
     - All React/Redux state data gets lost on a full-page reload.
 - We make use of the `Link` component provided by 'react-router-dom'.
@@ -1480,8 +1484,81 @@ const App = () => {
     );
 };
 ```
-##### Programmatic Navigation
+#### Programmatic Navigation
+Programmatic navigation is done through the `history` object.  If we change the url in the `history` object,
+the app will navigate.
 
+Given that the `history` object is automatically created by the all [types of routers](#types-of-routers), except
+the plain `Router`, it can by tricky to get a handle to the `history` object within our code.
+
+##### Approach 1: getting a handle on `history` through the props
+Every object that is rendered within a router, automatically gets the `history` object inside the 
+ props (`this.props.history`). With that, we just need to do `this.props.history.push('/some/path')` to do programmatic 
+ navigation.
+ 
+__Caveats__: when submitting forms, we typically want to navigate the user AFTER the async request has succeeded,
+NOT after the user pushes the submit button.  For this reason, we need to use __approach 2__.
+```jsx harmony
+class StreamCreate extends React.Component {
+    // ...
+    onSubmit = (formValues) => {
+        this.props.createStream(formValues);
+        // Navigation after submit: this.props.history.push('/streams');
+        // This is a problem because the user async request might fail and we will be navigating the user
+        // before the async request resolves. The action creator is a better place to do this.
+    };
+}
+```
+
+##### Approach 2: creating our own `history` object to get an easy handle to it everywhere
+We can create our own `history` object and inject it to plain `Router` to emmulate what the `BrowserRouter` component
+would do, but getting a handle to `history`.
+
+Creating our own history object:
+```jsx harmony
+// src/history.js
+import { createBrowserHistory } from 'history';
+export default createBrowserHistory(); //Auto installed by react-router-dom
+```
+
+Using a plain `Router` with our `history` object:
+```jsx harmony
+// src/components/App.js
+import React from 'react';
+import { Router, Route } from 'react-router-dom';
+import history from "../history";
+
+const App = () => {
+    return(
+        <div className="ui container">
+            {/* Inject our history into a plain router */}
+            <Router history={history}>
+                <div>
+                    <Route path="/streams/new" exact component={StreamCreate}/>
+                    <Route path="/streams/edit" exact component={StreamEdit}/>
+                    {/* ... */}
+                </div>
+            </Router>
+        </div>
+    );
+};
+```
+
+Getting a handle of our `history` object to navigate programmatically from within an action creator:
+```jsx harmony
+// src/actions/index.js
+import history from "../history";
+
+export const createStream = (formValues) => {
+    return async (dispatch, getState) => {
+        const userId = getState().auth.userId;
+        const response = await streams.post('/streams', {...formValues, userId });
+        dispatch({type: CREATE_STREAM, payload: response.data});
+        // Programmatic Navigation after the async request has finished and the action has been dispatched
+        history.push('/');
+    };
+};
+```
 
 #### Types of router in react-router-dom
 There are 3 types of router in react-router-dom. They exist to cater for different configurations of how the backend

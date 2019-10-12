@@ -51,9 +51,13 @@ class StreamCreate extends React.Component {
     // handleSubmit does NOT call our custom onSubmit function if the form has errors.
     onSubmit = (formValues) => {
         this.props.createStream(formValues);
+        // Navigation after submit: this.props.history.push('/streams');
+        // This is a problem because the user async request might fail and we will be navigating the user
+        // before the async request resolves. The action creator is a better place to do this.
     };
 
     render() {
+        console.log(this.props.history);
         return (
             // handleSubmit is injected by redux-form and wraps our custom 'onSubmit' function.
             // - It preventsDefault so that we don't need to do it

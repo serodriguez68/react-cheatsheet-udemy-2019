@@ -1,4 +1,5 @@
 import streams from "../apis/streams";
+import history from "../history";
 import {
     SIGN_IN,
     SIGN_OUT,
@@ -27,7 +28,8 @@ export const createStream = (formValues) => {
         const userId = getState().auth.userId;
         const response = await streams.post('/streams', {...formValues, userId });
         dispatch({type: CREATE_STREAM, payload: response.data});
-        // Do programmatic navigation right here
+        // Programmatic Navigation after the async request has finished and the action has been dispatched
+        history.push('/');
     };
 };
 
