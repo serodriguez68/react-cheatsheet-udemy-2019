@@ -2,6 +2,9 @@ import React from 'react';
 // Field is a react component
 // reduxForm is a function
 import { Field, reduxForm } from "redux-form";
+import { connect } from "react-redux";
+import {createStream} from "../../actions";
+
 
 class StreamCreate extends React.Component {
 
@@ -46,9 +49,9 @@ class StreamCreate extends React.Component {
     // handleSubmit passes the formValues as an argument.
     // e.g. formValues:  {title: "my title", description: "my description"}
     // handleSubmit does NOT call our custom onSubmit function if the form has errors.
-    onSubmit(formValues) {
-        // TODO: use redux-thunk to call an action creator that does an API request to post the data.
-    }
+    onSubmit = (formValues) => {
+        this.props.createStream(formValues);
+    };
 
     render() {
         return (
@@ -89,13 +92,20 @@ const validate = (formValues) => {
 };
 
 
-// reduxForm is a function that replaces connect function from react-redux
+// reduxForm is a function that serves an similar purpose connect function from react-redux
+// but limited to redux-form instrumentation.
 //   - It maps the state of the redux store to the props of the component
 //   - It injects the necessary action creators
 // reduxForm receives a single object to configure it
 //   - 'form' can be any string to describe the purpose of the form
 //   - 'validate' the validate function that will be used
-export default reduxForm({
+// @return The return of reduxForm(...)(StreamCreate) is a component that is our
+// component wrapped by reduxForm
+const formWrapped = reduxForm({
     form: 'streamCreate',
     validate: validate
 })(StreamCreate);
+
+// To inject custom state or action creators (not related to redux-form), we
+// still need to use connect
+export default connect(null, {createStream})(formWrapped);

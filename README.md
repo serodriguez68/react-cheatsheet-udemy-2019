@@ -1437,6 +1437,7 @@ export default App;
 - The `exact` property in the `Route` component modifies the matching behaviour to exact matching.
 
 #### Navigation in react-router
+##### Intentional Navigation: when the user clicks a button
 - We DON'T want to do a full page refresh to navigate, since it will trigger a __full reload__ of all the JS.
     - All React/Redux state data gets lost on a full-page reload.
 - We make use of the `Link` component provided by 'react-router-dom'.
@@ -1479,6 +1480,8 @@ const App = () => {
     );
 };
 ```
+##### Programmatic Navigation
+
 
 #### Types of router in react-router-dom
 There are 3 types of router in react-router-dom. They exist to cater for different configurations of how the backend
@@ -1809,12 +1812,15 @@ Creating a form with Redux-Form requires 3 things:
 1. Wire redux form into the component that contains the form using the `reduxForm` function.
 2. Wire up form fields using the `Field` wrapper component (see `Field` and `renderInput` next).
 3. Wire how to handle the form submission event using `handleSubmit` to wrap our custom `onSubmit` function.
+4. Wire a custom action creator to be used inside our `onSubmit` that will trigger an API request.
 
 ```jsx harmony
 import React from 'react';
 // Field is a react component
 // reduxForm is a function
 import { Field, reduxForm } from "redux-form";
+import { connect } from "react-redux";
+import {createStream} from "../../actions";
 
 class StreamCreate extends React.Component {
 
@@ -1842,11 +1848,12 @@ class StreamCreate extends React.Component {
     }
 
     // Our custom onSubmit function that will get wrapped by handleSubmit
-    // handleSubmit passes the formValues as an argument
+    // handleSubmit passes the formValues as an argument.
     // e.g. formValues:  {title: "my title", description: "my description"}
-    onSubmit(formValues) {
-        // TODO: use redux-thunk to call an action creator that does an API request to post the data.
-    }
+    // handleSubmit does NOT call our custom onSubmit function if the form has errors.
+    onSubmit = (formValues) => {
+        this.props.createStream(formValues);
+    };
 
     render() {
         return (
@@ -1869,14 +1876,21 @@ class StreamCreate extends React.Component {
 }
 
 
-// reduxForm is a function that replaces connect function from react-redux
+// reduxForm is a function that serves an similar purpose connect function from react-redux
+// but limited to redux-form instrumentation.
 //   - It maps the state of the redux store to the props of the component
 //   - It injects the necessary action creators
 // reduxForm receives a single object to configure it
 //   - 'form' can be any string to describe the purpose of the form
-export default reduxForm({
+// @return The return of reduxForm(...)(StreamCreate) is a component that is our
+// component wrapped by reduxForm
+const formWrapped = reduxForm({
     form: 'streamCreate'
 })(StreamCreate);
+
+// To inject custom state or action creators (not related to redux-form), we
+// still need to use connect.
+export default connect(null, {createStream})(formWrapped);
 ```
 
 #### Client-side field validation
@@ -1917,9 +1931,9 @@ class StreamCreate extends React.Component {
     };
     
     // handleSubmit does NOT call our custom onSubmit function if the form has errors.
-    onSubmit(formValues) {
+    onSubmit = (formValues) => {
         // ...
-    }
+    };
 
     render() {
         return (
@@ -1956,6 +1970,7 @@ export default reduxForm({
     validate: validate
 })(StreamCreate);
 ```
+
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
