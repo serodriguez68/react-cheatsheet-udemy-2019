@@ -49,8 +49,10 @@ export const fetchStream = (id) => {
 
 export const editStream = (id, updatedStream) => {
     return async (dispatch, _) => {
-        const response = await streams.put(`/streams/${id}`, updatedStream);
+        const response = await streams.patch(`/streams/${id}`, updatedStream);
         dispatch({type: EDIT_STREAM, payload: response.data});
+        // Programmatic Navigation after the async request has finished and the action has been dispatched
+        history.push('/');
     };
 };
 

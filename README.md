@@ -2117,6 +2117,113 @@ export default reduxForm({
 })(StreamCreate);
 ```
 
+#### Form component re-usability in redux-form
+This section shows a pattern for re-using a form component for a very common use case `new` and `edit` forms.  The 
+diagram shows the high-level strategy for re-use.
+ 
+![Form component re-usability in redux-form](diagrams/redux-form-form-component-reusability.svg)
+
+The key points are:
+- `onSubmit` is injected as a prop into the wrapped `StreamForm` component.
+- The `initialValues` property of any component that has been wrapped by `redux-form` is a special prop that
+allows us to set the values of the `form` object in the redux store, which in turns changes the value of the
+`Field` components inside the forms.
+- Use `StreamForm` within both the `StreamCreate` and the `StreamEdit` components. 
+
+```jsx harmony
+// StreamForm
+import React from 'react';
+import { Field, reduxForm } from "redux-form";
+
+
+class StreamForm extends React.Component {
+    // Redux form automatically changes the formProps with the initialValues prop 
+    renderInput = (formProps) => {
+        const meta = formProps.meta;
+        const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
+        return (
+            <div className={className}>
+                <label>{formProps.label}</label>
+                <input {...formProps.input} />
+                { this.renderError(meta) }
+            </div>
+        );
+    };
+
+    renderError ({error, touched}) { 
+        // ... 
+    };
+
+    // onSubmit uses the injected onSubmit prop defined by the parent component.
+    onSubmit = (formValues) => { this.props.onSubmit(formValues) };
+
+    render() {
+        return (
+            // Everything else is the same as any form
+            <form className="ui form error" onSubmit={this.props.handleSubmit(this.onSubmit)}>
+                <Field name='title' component={this.renderInput} label="Enter Title"/>
+                <Field name='description' component={this.renderInput} label="Enter Description"/>
+                <button className="ui button primary">Submit</button>
+            </form>
+        );
+    }
+}
+
+const validate = (formValues) => {
+    // ... 
+};
+
+// Returns the wrapped StreamForm
+// Note that the 'streamForm' key will be shared inside the redux-store for both new and edit forms
+export default reduxForm({
+    form: 'streamForm',
+    validate: validate
+})(StreamForm);
+```
+```jsx harmony
+// Stream Edit
+import React from 'react';
+import { connect } from 'react-redux';
+import { fetchStream, editStream } from "../../actions";
+import StreamForm from "./StreamForm";
+
+
+class StreamEdit extends React.Component {
+    componentDidMount() {
+        // Load data for this component to work
+    }
+    
+    // Our custom onSubmit function that will get injected into the StreamForm component as a prop 
+    onSubmit  = (formValues) => {
+      this.props.editStream(this.props.stream.id, formValues);
+    };
+
+    render(){
+        if (!this.props.stream) {
+            return <div>Loading...</div>;
+        }
+        const {title, description} = this.props.stream;
+        return (
+            <div>
+                <h3>Edit Stream</h3>
+                {/* InitialValues is a special redux-form prop to indicate the form values of the StreamForm */}
+                {/* Make sure you only pass initial values that have a corresponding Field in the form */}
+                <StreamForm initialValues={{title, description}}
+                            onSubmit={this.onSubmit}/>
+            </div>
+        );
+    }
+}
+
+const mapStateToProps = (state, ownProps) => {
+    const urlId = ownProps.match.params.id;
+    return {
+        stream: state.streams[urlId]
+    };
+};
+
+export default connect(mapStateToProps, {fetchStream, editStream})(StreamEdit);
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to

@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchStream } from "../../actions";
+import { fetchStream, editStream } from "../../actions";
+import StreamForm from "./StreamForm";
 
 
 class StreamEdit extends React.Component {
@@ -11,11 +12,26 @@ class StreamEdit extends React.Component {
         this.props.fetchStream(urlId);
     }
 
+    // Our custom onSubmit function that will get injected into the StreamForm component
+    // as a prop
+    onSubmit  = (formValues) => {
+      this.props.editStream(this.props.stream.id, formValues);
+    };
+
     render(){
         if (!this.props.stream) {
             return <div>Loading...</div>;
         }
-        return (<div>{this.props.stream.title}</div>);
+        const {title, description} = this.props.stream;
+        return (
+            <div>
+                <h3>Edit Stream</h3>
+                {/* InitialValues is a special redux-form prop to indicate the form values of the StreamForm */}
+                {/* Make sure you only pass initial values that have a corresponding Field in the form */}
+                <StreamForm initialValues={{title, description}}
+                            onSubmit={this.onSubmit}/>
+            </div>
+        );
     }
 }
 
@@ -28,4 +44,4 @@ const mapStateToProps = (state, ownProps) => {
     };
 };
 
-export default connect(mapStateToProps, {fetchStream})(StreamEdit);
+export default connect(mapStateToProps, {fetchStream, editStream})(StreamEdit);
