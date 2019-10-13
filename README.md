@@ -1571,6 +1571,75 @@ server serves the React application bundle.js.  Here is an illustration of the p
 full page reloads always point to the root so the backend needs to be configured to return the SPA from the index.
 - `MemoryRouter`: keeps state internally and does not modify the URL.  If the user refreshes, the react app goes back to the root.
 
+#### Wildcard URL matching
+We can use `react-router` to support urls like `/streams/edit/:id` and pass the information of the wildcard 
+(`id` in this case) down to the component as a prop. To do that, we need to wire some things:
+
+Configure the `Route` to support the wildcard parameter: 
+```jsx harmony
+// src/components/App.js
+const App = () => {
+    return(
+        <div className="ui container">
+            <Router history={history}>
+                <div>
+                    { /* :id indicates a URL param passed using the key id: */}
+                    <Route path="/streams/edit/:id" exact component={StreamEdit}/>
+                    { /* ... */}
+                </div>
+            </Router>
+        </div>
+    );
+};
+```
+
+Use the wildcard parameter inside the corresponding component (`StreamEdit` in this example).  
+- The `Router` automatically passes the `this.props.match` object to all elements rendered by it.
+  - `this.props.match.params` contains an object with all the wildcard matches.
+-  IMPORTANT: Each component than can be accessed through wildcard matching MUST be designed to work in isolation 
+(i.e. it needs to fetch its own data).
+  - It cannot assume that the data it needs to function is magically there in the redux store.
+
+```jsx harmony
+import React from 'react';
+import { connect } from 'react-redux';
+import { fetchStream } from "../../actions";
+
+class StreamEdit extends React.Component {
+    componentDidMount() {
+        // IMPORTANT: components that rely on wildcard navigation must be self-sufficient and
+        // fetch the data that they need.  We cannot rely on the data being present on the redux store.
+        const urlId = this.props.match.params.id;
+        this.props.fetchStream(urlId);
+    }
+
+    render(){
+        // On the first render, props.streams is undefined because things have not been loaded yet.
+        if (!this.props.stream) {
+            return <div>Loading...</div>;
+        }
+        return (<div>{this.props.stream.title}</div>);
+    }
+}
+
+const mapStateToProps = (state, ownProps) => {
+    // The Router in React-Router-Dom injects a match object as props that contains the wildcard matches
+    // as params.
+    const urlId = ownProps.match.params.id;
+    return{
+        stream: state.streams[urlId]
+    };
+};
+
+export default connect(mapStateToProps, {fetchStream})(StreamEdit);
+```
+Link to routes that have wildcard matching:
+```jsx harmony
+import { Link } from 'react-router-dom';
+// ...
+<Link to={`/streams/edit/${stream.id}`}>Edit</Link>
+```
+
 ## Authentication with React using OAuth
 
 ### Types of OAuth Authentication
