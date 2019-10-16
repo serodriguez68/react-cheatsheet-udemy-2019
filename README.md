@@ -2225,6 +2225,23 @@ const mapStateToProps = (state, ownProps) => {
 export default connect(mapStateToProps, {fetchStream, editStream})(StreamEdit);
 ```
 
+### React Portals
+
+#### Motivation
+![React Portals Motivation](diagrams/react-portals-motivation.svg)
+
+- Modals in react will be deeply nested 
+- Portal, lets a components render another component NOT as a direct child, but as a child of another element (typically the body)
+
+_Problem_
+- StreamDelete needs to render a Modal but it can only do so by nesting it within itself.
+- By the time an arbitrary element needs to render a modal, it could be arbitrarily nested, making it impossible to 
+style as a modal reliably (because it depends on the styling of all the chain.)
+
+_Solution_
+- Portals allow a component to render another component but NOT as a direct child, but as a child of another element.
+  - This other element is typically the `body`, but it doesn't have to be the body.
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
