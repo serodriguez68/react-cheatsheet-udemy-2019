@@ -2226,6 +2226,8 @@ export default connect(mapStateToProps, {fetchStream, editStream})(StreamEdit);
 ```
 
 ### React Portals
+React portals are a general concept that we will illustrate through the *modal* use case. However, there are other
+use cases for this feature.
 
 #### Motivation
 ![React Portals Motivation](diagrams/react-portals-motivation.svg)
@@ -2241,6 +2243,56 @@ style as a modal reliably (because it depends on the styling of all the chain.)
 _Solution_
 - Portals allow a component to render another component but NOT as a direct child, but as a child of another element.
   - This other element is typically the `body`, but it doesn't have to be the body.
+ - Typical Portal use cases: modals, use react to render content into an element that was not created by your react app
+ (e.g. a 3rd party element or a server-rendered html element.).
+
+#### Basic Portal Code
+Create a target html element for the portal:
+```html
+<body>
+    <div id="root"></div>
+    <!--  This will be used as the modal portal target, everything inside will be replaced  -->
+    <div id="modal"></div>
+  </body>
+```
+
+Create the portal component:
+```jsx harmony
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const Modal = props => {
+    // When we create a portal, we return whatever ReactDOM.createPortal returns.
+    // The function takes 2 args:
+    //   1) The jsx we want to render
+    //   2) The element we want to render (1) into. Note that everything inside will be replaced
+    // Note the classNames are specific to semantic ui
+    return ReactDOM.createPortal(
+        <div className="ui dimmer modals visible active">
+            <div className="ui standard modal visible active">
+                This is the content of the modal
+            </div>
+        </div>,
+        document.querySelector('#modal')
+    );
+};
+
+export default Modal;
+```
+
+Render the portal from other component:
+```jsx harmony
+import Modal from "../Modal";
+
+const StreamDelete = () => {
+    return (
+        <div>
+            StreamDelete
+            <Modal/>
+        </div>
+    );
+};
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
