@@ -1640,6 +1640,27 @@ import { Link } from 'react-router-dom';
 <Link to={`/streams/edit/${stream.id}`}>Edit</Link>
 ```
 
+#### Wildcard URL matching pitfalls and `Switch`
+Vanilla wildcard URL matching can introduce false positive matching.
+```jsx harmony
+<Route path="/streams/new" exact component={StreamCreate}/>
+<Route path="/streams/:id" exact component={StreamShow}/>
+{/* ... */}
+``` 
+In the above example, when the user visits the url `streams/new`, BOTH routes will get matched with `id = new` in the
+second one.
+
+To limit the matching of a route to the first match, we use the `Switch` component.
+```jsx harmony
+import { Router, Route, Switch } from 'react-router-dom';
+<Switch>
+    {/* ... */}
+    <Route path="/streams/new" exact component={StreamCreate}/>
+    <Route path="/streams/:id" exact component={StreamShow}/>
+    {/* ... */}
+</Switch>
+```
+
 ## Authentication with React using OAuth
 
 ### Types of OAuth Authentication
