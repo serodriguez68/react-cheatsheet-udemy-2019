@@ -60,5 +60,7 @@ export const deleteStream = (id) => {
     return async (dispatch, _) => {
         await streams.delete(`/streams/${id}`);
         dispatch({type: DELETE_STREAM, payload: id});
+        // Programmatic Navigation after the async request has finished and the action has been dispatched
+        history.push('/');
     };
 };

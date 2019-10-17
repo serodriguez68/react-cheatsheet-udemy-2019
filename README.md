@@ -2268,9 +2268,15 @@ const Modal = props => {
     //   2) The element we want to render (1) into. Note that everything inside will be replaced
     // Note the classNames are specific to semantic ui
     return ReactDOM.createPortal(
-        <div className="ui dimmer modals visible active">
-            <div className="ui standard modal visible active">
-                This is the content of the modal
+        <div onClick={props.onDismiss} className="ui dimmer modals visible active">
+            { /* MODAL SPECIFIC COMMENT: */ }            
+            { /* The default behaviour of HTML events is to propagate up the elements until */ }
+            { /* some element handles it.  Here we want to stopPropagation to avoid navigating */ }
+            { /* the user when he clicks inside the modal box */ }
+            <div onClick={(e) => e.stopPropagation()} className="ui standard modal visible active">
+                <div className="header">{props.title}</div>
+                <div className="content">{props.content}</div>
+                <div className="actions">{props.actions}</div>
             </div>
         </div>,
         document.querySelector('#modal')
@@ -2282,17 +2288,51 @@ export default Modal;
 
 Render the portal from other component:
 ```jsx harmony
+import React from 'react';
 import Modal from "../Modal";
+import history from "../../history";
 
 const StreamDelete = () => {
+    const actions = (
+        <div>
+            <button className="ui button negative">Delete</button>
+            <button className="ui button">Cancel</button>
+        </div>
+    );
+
     return (
         <div>
             StreamDelete
-            <Modal/>
+            <Modal
+                title="Delete Stream"
+                content="Are you sure you want to delete this stream?"
+                actions={actions}
+                onDismiss={()=> history.push('/')}
+            />
         </div>
     );
 };
+
+export default StreamDelete;
 ```
+## React Fragments
+By default, to return sibling elements in JSX we are forced to wrap them with a "dummy div" so that we only return one
+element.
+
+This wrapping may be unacceptable in some circumstances. For example, it might throw-off the styling of a CSS 
+framework that expects a specific structure.
+
+`React.Fragment`s allow us to use "an invisible wrapper" that does not get rendered in the DOM.
+
+```jsx harmony
+const actions = (
+        <React.Fragment>
+            <button className="ui button negative">Delete</button>
+            <button className="ui button">Cancel</button>
+        </React.Fragment>
+    );
+```  
+
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
