@@ -2369,8 +2369,103 @@ Note: the app `9_translate_context` contains the code samples for this section.
 
 ### How does the Context System work?
 The context system works as a pipeline that pushed data down from parents to children.
-#### How to get information in and out of the pipe
-![ How to get information in and out of the pipe](./diagrams/react-contex)
+
+#### Crate a dedicated context object
+The first thing we want to do when working with context is to create dedicated context objects that we import inside
+other files only when needed. We do so by creating a `contexts` folder and creating a `someContext.js` file per
+context we are interested in.
+
+Each context object represents a pipeline of data that is passed down from the parents to all children.
+
+```jsx harmony
+// src/contexts/LanguageContext.js
+import React from 'react';
+export default React.createContext();
+```
+
+#### How to get information IN and OUT of the context object in the pipeline
+![ How to get information in and out of the pipe](./diagrams/react-context-how-to-use.svg)
+
+__There are 2 ways to get data IN.__
+ Way 1. By setting a default value    
+```jsx harmony
+// src/contexts/LanguageContext.js
+import React from 'react';
+// createContext takes a default value.  It can be anything (e.g. an object, an array, etc...)
+export default React.createContext('english');
+```
+
+Way 2. By using a `Provider` component withing the parent component.
+- Allows us to modify the default value.
+- `Provider` is a component that allows us to signal the scope of a particular INSTANCE of a context object.
+  - Every time we use the `<LangContext.Provider value={...}>...</LangContext.Provider>` a new instance of 
+  `LancContext` is created and used only within the scope of whatever is nested. 
+  - NOT the same `provider` than the one from `react-redux`.
+```jsx harmony
+import React from 'react';
+import UserCreate from "./UserCreate";
+import LanguageContext from "../contexts/LanguageContext";
+
+class App extends React.Component {
+    state = { language: 'english' };
+
+    onLanguageChange = (newLanguage) => {
+        this.setState({language: newLanguage});
+    };
+
+    render() {
+        return (
+            <div className="ui container">
+                <div>
+                    Select a Language:&nbsp;
+                    <i className="flag us" onClick={() => this.onLanguageChange('english') }/>
+                    <i className="flag nl" onClick={() =>  this.onLanguageChange('dutch') } />
+                </div>
+                {/* - With the LanguageContext.Provider component we create an instance of the LangContext */}
+                {/*   - That instance is scoped to the all children nested within */}
+                {/* - With the value property, we can modify the value of the context. We can use anything. */}
+                <LanguageContext.Provider value={this.state.language} >
+                    <UserCreate/>
+                </LanguageContext.Provider>
+
+                {/* This is ANOTHER INSTANCE of LanguageContext that is completely independent from the one above */}
+                <LanguageContext.Provider value={'english'} >
+                    <UserCreate/>
+                </LanguageContext.Provider>
+            </div>
+        );
+    }
+}
+
+export default App;
+```
+
+
+__There are 2 ways to get data OUT__
+
+Way 1: By using `this.context`
+```jsx harmony
+import React from 'react';
+import LanguageContext from "../contexts/LanguageContext";
+
+class Button extends React.Component {
+    // Connect the Language Context to the Component
+    // contextType is a special property for React.
+    static contextType = LanguageContext;
+
+    render() {
+        // this.context is used to get the data in the contexts
+        const text = this.context === 'english' ? 'Submit' : 'Voorleggen';
+        return(
+            <button className="ui button primary">{text}</button>
+        );
+    }
+}
+
+export default Button;
+```
+
+Way 2: By creating a `Consumer` component
 
 
 
