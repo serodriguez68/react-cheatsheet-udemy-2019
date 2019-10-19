@@ -2354,6 +2354,25 @@ const actions = (
     );
 ```  
 
+## React Context
+Note: the app `9_translate_context` contains the code samples for this section.
+
+###  Motivation
+- *The Props System:* communicate from parent to DIRECT child.
+- *The Context System:* Pass data from a PARENT component to ANY NESTED child component. 
+    - Not necessarily the direct children.
+    - It is just about data communication, just like props so it is not full replacement of Redux.
+    - Sometimes we just want to communicate something from the parent to a deeply nested
+    child and the components in the middle don't really care about the communication.
+    - Using only props, we end up using the intermediate components just to push down data, even if they don't care.
+![What is the Context System?](./diagrams/react-context-system-motivation.svg)
+
+### How does the Context System work?
+The context system works as a pipeline that pushed data down from parents to children.
+#### How to get information in and out of the pipe
+![ How to get information in and out of the pipe](./diagrams/react-contex)
+
+
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
