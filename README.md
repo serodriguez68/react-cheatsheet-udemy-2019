@@ -2386,8 +2386,9 @@ export default React.createContext();
 #### How to get information IN and OUT of the context object in the pipeline
 ![ How to get information in and out of the pipe](./diagrams/react-context-how-to-use.svg)
 
-__There are 2 ways to get data IN.__
- Way 1. By setting a default value    
+##### There are 2 ways to get data IN.
+###### Way 1. By setting a default value 
+ - This is barely usable, way 2 makes much more sense.   
 ```jsx harmony
 // src/contexts/LanguageContext.js
 import React from 'react';
@@ -2395,11 +2396,11 @@ import React from 'react';
 export default React.createContext('english');
 ```
 
-Way 2. By using a `Provider` component withing the parent component.
+###### Way 2. By using a `Provider` component withing the parent component.
 - Allows us to modify the default value.
 - `Provider` is a component that allows us to signal the scope of a particular INSTANCE of a context object.
   - Every time we use the `<LangContext.Provider value={...}>...</LangContext.Provider>` a new instance of 
-  `LancContext` is created and used only within the scope of whatever is nested. 
+  `LangContext` is created and used only within the scope of whatever is nested. 
   - NOT the same `provider` than the one from `react-redux`.
 ```jsx harmony
 import React from 'react';
@@ -2423,7 +2424,7 @@ class App extends React.Component {
                 </div>
                 {/* - With the LanguageContext.Provider component we create an instance of the LangContext */}
                 {/*   - That instance is scoped to the all children nested within */}
-                {/* - With the value property, we can modify the value of the context. We can use anything. */}
+                {/* - With the value property, we can modify the value of the context. We can use anything for the value. */}
                 <LanguageContext.Provider value={this.state.language} >
                     <UserCreate/>
                 </LanguageContext.Provider>
@@ -2441,9 +2442,9 @@ export default App;
 ```
 
 
-__There are 2 ways to get data OUT__
+##### There are 2 ways to get data OUT
 
-Way 1: By using `this.context`
+###### Way 1: By using `this.context`
 ```jsx harmony
 import React from 'react';
 import LanguageContext from "../contexts/LanguageContext";
@@ -2465,9 +2466,93 @@ class Button extends React.Component {
 export default Button;
 ```
 
-Way 2: By creating a `Consumer` component
+###### Way 2: By creating a `Consumer` component
+- The `Consumer` component is automatically created within the `context` object.
+- We use the `Consumer` whenever we want to use the value inside the context.
 
+```jsx harmony
+import React from 'react';
+import LanguageContext from "../contexts/LanguageContext";
 
+class Button extends React.Component {
+    render() {
+        return(
+            <button className="ui button primary">
+                <LanguageContext.Consumer>
+                    {/* We always need to provide a function as a child to the Consumer */}
+                    {/* The function is called with the context value as an argument and we */}
+                    {/* can put any logic we want within the function (including returning other components) */}
+                    {(value) => value === 'english' ? 'Submit' : 'Voorleggen'}
+                </LanguageContext.Consumer>
+            </button>
+        );
+    }
+}
+export default Button;
+```
+
+###### When to use a `Consumer` instead of `this.context`
+- We need to use `Consumer` when we need to access data out of MULTIPLE context objects within a single component.
+    - The `this.context` approach only allows for one context per object to be used.
+
+```jsx harmony
+import React from 'react';
+import LanguageContext from "../contexts/LanguageContext";
+import ColorContext from "../contexts/ColorContext";
+
+class Button extends React.Component {
+
+    renderButton(color){
+        return(
+            <button className={`ui button ${color}`}>
+                <LanguageContext.Consumer>
+                    {(value) => value === 'english' ? 'Submit' : 'Voorleggen'}
+                </LanguageContext.Consumer>
+            </button>
+        );
+    }
+
+    render() {
+        return(
+            // To read from multiple contexts we nest Consumer components.
+            // The same rule of having a consumer return a function applies.
+            // In this case we use a helper function to organize the code
+            <ColorContext.Consumer>
+                { (color) => this.renderButton(color) }
+            </ColorContext.Consumer>
+        );
+    }
+}
+
+export default Button;
+``` 
+
+```jsx harmony
+import React from 'react';
+import UserCreate from "./UserCreate";
+import LanguageContext from "../contexts/LanguageContext";
+import ColorContext from "../contexts/ColorContext";
+
+class App extends React.Component {
+    state = { language: 'english', color: 'red' };
+    //...
+    render() {
+        return (
+            <div className="ui container">
+                {/* To pass in multiple contexts, we just nest providers. */}
+                {/* Order does not matter in this case */}
+                <LanguageContext.Provider value={this.state.language} >
+                    <ColorContext.Provider value={this.state.color}>
+                        <UserCreate/>
+                    </ColorContext.Provider>
+                </LanguageContext.Provider>
+            </div>
+        );
+    }
+}
+
+export default App;
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
