@@ -2370,7 +2370,7 @@ Note: the app `9_translate_context` contains the code samples for this section.
 ### How does the Context System work?
 The context system works as a pipeline that pushed data down from parents to children.
 
-#### Crate a dedicated context object
+#### Create a dedicated context object
 The first thing we want to do when working with context is to create dedicated context objects that we import inside
 other files only when needed. We do so by creating a `contexts` folder and creating a `someContext.js` file per
 context we are interested in.
@@ -2553,6 +2553,29 @@ class App extends React.Component {
 
 export default App;
 ```
+###  Does Context replace Redux?
+Not really, vanilla Context only provides ONE of the many other things that redux provides.
+ - Redux 
+  - Features: 
+    - Distributes data to various components
+    - Centralizes data in a store
+    - Provides a mechanism for changing data in the store
+  - Pros: 
+      - Excellent documentation
+      - Well-known design patterns
+      - Tremendous amount of open source libraries
+- Context:
+  - Features:
+    - Distribute data to various components
+  - Pros:
+    - No extra libraries
+  - Cons:
+    - Hard to build 'store' components that need to reach into other 'store' components 
+- Stephen Grider does NOT personally recommend replacing `redux` with context.
+ 
+If you want to know how to replace `redux` with `Context`, watch the "Replacing Redux with Context" section in
+Udemy. 
+   - There is a fair amount of work involved in doing this properly. 
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
