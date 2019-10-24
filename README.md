@@ -2592,7 +2592,6 @@ This is NOT the reason to use them.
 These are some of the available hooks. The documentation contains more.
 ![available hooks](./diagrams/react-hooks-available-hooks.svg)
 
-
 ### The `useState` hook
 ```jsx harmony
 // useState allows us to use the state system in functional components
