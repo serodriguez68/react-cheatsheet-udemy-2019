@@ -2577,6 +2577,16 @@ If you want to know how to replace `redux` with `Context`, watch the "Replacing 
 Udemy. 
    - There is a fair amount of work involved in doing this properly. 
 
+
+## React's Hook system
+
+### Motivation
+![React's hook system motivation](./diagrams/react-hooks-motivation.svg)
+- At first, it may seem that we are trying to emulate `state` and `lifecycle methods` in function components.
+This is NOT the reason to use them. 
+- We use them because they makes it easy to share logic between components.
+  - They solve problems of code re-use that are hard to achieve with class based components.
+
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`
