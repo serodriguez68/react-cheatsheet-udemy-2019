@@ -2579,13 +2579,50 @@ Udemy.
 
 
 ## React's Hook system
+See the `10_hooks_simple` and `TODO` projects for sample applications built with hooks.
 
 ### Motivation
 ![React's hook system motivation](./diagrams/react-hooks-motivation.svg)
 - At first, it may seem that we are trying to emulate `state` and `lifecycle methods` in function components.
 This is NOT the reason to use them. 
-- We use them because they makes it easy to share logic between components.
+- We use them because they makes it __easy to share logic between components__.
   - They solve problems of code re-use that are hard to achieve with class based components.
+
+### Some Available Hooks
+These are some of the available hooks. The documentation contains more.
+![available hooks](./diagrams/react-hooks-available-hooks.svg)
+
+
+### The `useState` hook
+```jsx harmony
+// useState allows us to use the state system in functional components
+import React, {useState} from 'react';
+
+const App = () => {
+    // useState gives us access to the current value and the setState function of an INDEPENDENT slice of state.
+    // Calling the setState function causes the component to automatically re-render.
+    // Explanation:   [currentStateValue, functionToUpdateState] = functionFromReact( initialStateValue )
+    // Analogies  :      this.state.foo    this.setState({foo: 'bar'})               state={foo: 'baz'}
+    const [resource, setResource] = useState('posts');
+    // Syntax: Array destructuring [redVar, greenVar] = ['red', 'green']
+
+    // More on INDEPENDENT slice of state:
+    // We can have multiple useStates in a component, and each will deal with their own independent state
+    // const [count, setCount] = useState(0);
+
+    return (
+        <div>
+            <div>
+                <button onClick={() => setResource('posts')}>Posts</button>
+                <button onClick={() => setResource('todos')}>Todos</button>
+            </div>
+            {resource}
+        </div>
+    );
+};
+
+export default App;
+```
 
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
