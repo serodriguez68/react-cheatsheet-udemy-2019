@@ -2607,7 +2607,7 @@ const App = () => {
 
     // More on INDEPENDENT slice of state:
     // We can have multiple useStates in a component, and each will deal with their own independent state
-    // const [count, setCount] = useState(0);
+    const [count, setCount] = useState(0);
 
     return (
         <div>
@@ -2666,8 +2666,63 @@ const ResourceList = ({ resource }) => {
 export default ResourceList;
 ```
 
-### Code re-use with Hooks
-This section illustrates code re-use with an example. The `useResources` auxiliary function: 
+### Code re-use with custom Hooks
+This section illustrates code re-use with some examples. Custom hooks allow us to encapsulate business logic outside
+view logic and re-use it whenever needed.
+
+#### Example 1: The `useLocation` custom Hook 
+This example illustrates a simple custom hook that follows community convention .
+##### The Custom Hook
+```jsx harmony
+import {useState, useEffect} from 'react';
+
+// Gets the user's latitude from the browser's geolocation and
+// returns the latitude and an errorMessage
+const useLocation =  () => {
+    // Internally uses 2 independent pieces of state
+    const [lat, setLat] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const getUserLocation = () => {
+        // Gets 2 function callbacks: On success, On failure
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => setLat(position.coords.latitude),
+            (err) => setErrorMessage(err.message)
+        );
+    };
+
+    useEffect(() => getUserLocation(), []);
+    // It is community convention that hooks return values in array format
+    return [lat, errorMessage];
+};
+
+export default useLocation;
+```
+##### Using the custom hook
+```jsx harmony
+import React from 'react';
+import useLocation from "./useLocation";
+// ...
+
+const App = () =>  {
+    // We use the custom hook as if it where any other hook (follows community convention).
+    const [lat, errorMessage] = useLocation();
+    let content;
+    if (errorMessage) {
+        content =  <div>Error: {errorMessage}</div>;
+    } else if (!errorMessage && lat) {
+        content =  <SeasonDisplay lat={lat} />
+    } else {
+        content =  <Spinner message = 'Determining your Location...'/>;
+    }
+    return <div className="some-class-that-is-always-needed">{content}</div>;
+};
+```
+
+#### Example 2: The `useResources` custom Hook
+This example illustrates that multiple usages of the custom hook behave like independent instances (keep reading).
+
+The `useResources` custom hook: 
 - Encapsulates the logic of calling an api.
 - Encapsulates the logic of when resources need to be re-fetched (using `useEffect`). 
 - Separates the presentation logic form the api logic.
@@ -2678,11 +2733,10 @@ component that used it.
   of `ResourceList` to decide if the effect should get called. 
     - As opposed to using information from the previous application-wide call to `useResources`.
 
-#### Reusable function
+##### Reusable function
 ```jsx harmony
 import {useState, useEffect} from 'react';
 import axios from 'axios';
-
 
 // Code Reuse with hooks
 // useResources is a utility function that gets a resource type (e.g. 'posts') and returns an array of resources.
@@ -2706,7 +2760,7 @@ const useResources = (resource) => {
 export default useResources;
 ```
 
-#### Components using the re-usable function
+##### Components using the re-usable function
 ```jsx harmony
 import React from 'react';
 import useResources from "./useResources";
