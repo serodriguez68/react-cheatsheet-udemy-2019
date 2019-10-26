@@ -2622,7 +2622,122 @@ const App = () => {
 
 export default App;
 ```
+### The `useEffect` hook
+```jsx harmony
+// useEffect hook: allows use of 'lifecycle methods' in function-based components
+import React, {useState, useEffect} from 'react';
+import axios from 'axios';
 
+const ResourceList = ({ resource }) => {
+    const [resources, setResources] = useState([]);
+
+    // A custom function we built to fetch data and update the state
+    // useEffect forces us to declare a helper function for async requests to use within the effect.
+    // If we don't do this, we will get a warning related to "cleanup"
+    const fetchResource = async (resource) => {
+        const response = await axios.get(`https://jsonplaceholder.typicode.com/${resource}`);
+        setResources(response.data);
+    };
+
+    // useEffect is a hook serves the function componentDidMount + componentDidUpdate combined.
+    // It takes 2 arguments:
+    // 1. An 'effect' function that will get called when the conditions at 2 are met.
+    // 2. An array of stuff.  The effect function will get called when the stuff passed on this re-render
+    //    is different from the stuff on the previous re-render.
+    //    - The function always gets called on the first render (i.e. on mount)
+    //    - If the second argument is an empty array [], the function only gets called "on mount".
+    //    - If the second argument is not given, the function always gets called when render happens (i.e. on mount and update)
+    //
+    // The effect of (2) is equivalent to guarding componentDidUpdate for change on a class-based component. e.g:
+    // async componentDidUpdate(prevProps) {
+    //     if (!prevProps.resource !== this.props.resource) {
+    //         const response = await axios.get(`https://jsonplaceholder.typicode.com/${resource}`);
+    //         this.setState({resources: response.data});
+    //     }
+    // }
+    useEffect(
+        () => {fetchResource(resource)},
+        [resource]
+    );
+
+    return  <div>{resources.length}</div>;
+};
+
+export default ResourceList;
+```
+
+### Code re-use with Hooks
+This section illustrates code re-use with an example. The `useResources` auxiliary function: 
+- Encapsulates the logic of calling an api.
+- Encapsulates the logic of when resources need to be re-fetched (using `useEffect`). 
+- Separates the presentation logic form the api logic.
+- Every use of `useResources` scopes down an "instance" of the `useState` and `useEffect` that is tied THAT particular
+component that used it. 
+  - In this example, `UserList` and `ResourceList` both have independent records of `state` and `effect`. 
+  - For example, the `useEffect` inside `ResourceList`, uses the information from the previous re-rendering
+  of `ResourceList` to decide if the effect should get called. 
+    - As opposed to using information from the previous application-wide call to `useResources`.
+
+#### Reusable function
+```jsx harmony
+import {useState, useEffect} from 'react';
+import axios from 'axios';
+
+
+// Code Reuse with hooks
+// useResources is a utility function that gets a resource type (e.g. 'posts') and returns an array of resources.
+// This function an easily be used by other components.
+// This utility function holds no presentation logic, only api interaction logic.
+const useResources = (resource) => {
+    const [resources, setResources] = useState([]);
+    const fetchResource = async (resource) => {
+        const response = await axios.get(`https://jsonplaceholder.typicode.com/${resource}`);
+        setResources(response.data);
+    };
+    
+    useEffect(
+        () => {fetchResource(resource)},
+        [resource]
+    );
+
+    return resources;
+};
+
+export default useResources;
+```
+
+#### Components using the re-usable function
+```jsx harmony
+import React from 'react';
+import useResources from "./useResources";
+
+const UserList = () => {
+ const users = useResources('users');
+ return(
+   <ul>
+       { users.map( user => <li key={user.id}>{user.name}</li>) }
+   </ul>
+ );
+};
+
+export default UserList;
+```
+
+```jsx harmony
+import React from 'react';
+import useResources from './useResources';
+
+const ResourceList = ({ resource }) => {
+    const resources = useResources(resource);
+    return  (
+        <ul>
+            {resources.map((record) => <li key={record.id}>{record.title}</li>)}
+        </ul>
+    );
+};
+
+export default ResourceList;
+```
 ----------------------------------------------------------------
 Note: to edit any of the diagrams go to
 `https://www.draw.io/#Hserodriguez68%2Freact-cheatsheet-udemy-2019%2Fmaster%2Fdiagrams%2F{name of diagram}.svg`

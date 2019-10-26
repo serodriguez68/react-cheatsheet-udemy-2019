@@ -1,6 +1,7 @@
 // useState allows us to use the state system in functional components
 import React, {useState} from 'react';
 import ResourceList from "./ResourceList";
+import UserList from "./UserList";
 
 const App = () => {
     // useState gives us access to the current value and the setState function of an INDEPENDENT slice of state.
@@ -16,6 +17,7 @@ const App = () => {
 
     return (
         <div>
+            <UserList/>
             <div>
                 <button onClick={() => setResource('posts')}>Posts</button>
                 <button onClick={() => setResource('todos')}>Todos</button>
